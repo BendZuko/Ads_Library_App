@@ -992,12 +992,21 @@ table.dataTable td {
 }
 
 .delete-btn {
-    background: var(--danger-color);
+    background: var(--error-color);
     color: white;
-    padding: 6px 12px;
+    padding: 6px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
 }
 
 .close-btn {
@@ -1325,4 +1334,47 @@ table.dataTable td.dt-body-right {
 .filtered-view-btn:hover {
     transform: translateY(-1px);
     opacity: 0.9;
+}
+
+/* Add styles for the search actions and delete button */
+.search-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.delete-btn {
+    background: var(--error-color);
+    color: white;
+    padding: 6px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+/* Update the saved-search-item to accommodate the new layout */
+.saved-search-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* Add these styles for the loading state */
+.load-all-videos-btn.loading {
+    background: var(--error-color);
+}
+
+.load-all-videos-btn.loading:hover {
+    background: #dc2626;
 }

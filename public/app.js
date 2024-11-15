@@ -4,6 +4,7 @@ let adsTable;
 let filteredPages = new Set();
 let filteredAds = new Set();
 let savedSearchesSidebarVisible = false;
+let isLoadingVideos = false;
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -98,38 +99,80 @@ function updateResults(ads) {
         adsTable.destroy();
     }
 
-    const tableBody = document.querySelector('#adsTable tbody');
-    tableBody.innerHTML = ads.map(ad => createTableRow(ad)).join('');
+    // Store the data for later use
+    currentAdsData = ads;
 
-    initializeDataTable();
-}
-
-function createTableRow(ad) {
-    return `
-        <tr data-ad-id="${ad.id}">
-            <td>${formatDate(ad.ad_creation_time)}</td>
-            <td>${ad.eu_total_reach || 0}</td>
-            <td>${escapeHtml(ad.page_name)}</td>
-            <td>
-                <button onclick="fetchVideo('${ad.ad_snapshot_url}', this)" class="action-btn video-btn">
-                    <i class="fas fa-video"></i> Load Video
-                </button>
-            </td>
-            <td>
-                <a href="${ad.ad_snapshot_url}" target="_blank" class="action-btn view-btn">
-                    <i class="fas fa-external-link-alt"></i> View
-                </a>
-            </td>
-            <td class="filter-actions">
-                <button onclick="filterAd('${ad.id}')" class="action-btn filter-btn">
-                    <i class="fas fa-filter"></i> Filter
-                </button>
-                <button onclick="filterPage('${escapeHtml(ad.page_name)}')" class="action-btn filter-page-btn">
-                    <i class="fas fa-building"></i> Filter Page
-                </button>
-            </td>
-        </tr>
-    `;
+    // Initialize DataTable with the data
+    adsTable = $('#resultsTable').DataTable({
+        data: ads,
+        columns: [
+            { 
+                data: 'ad_creation_time',
+                title: 'Creation Date',
+                width: '10%',
+                className: 'dt-center',
+                render: function(data) {
+                    return new Date(data).toLocaleDateString();
+                }
+            },
+            { 
+                data: 'page_name',
+                title: 'Page Name',
+                width: '15%',
+                className: 'dt-center'
+            },
+            { 
+                data: 'eu_total_reach',
+                title: 'EU Total Reach',
+                width: '12%',
+                className: 'dt-body-right dt-head-center',
+                render: function(data) {
+                    return data ? data.toLocaleString() : '0';
+                }
+            },
+            {
+                data: 'ad_snapshot_url',
+                title: 'Video',
+                width: '35%',
+                className: 'dt-center video-column',
+                render: function(data) {
+                    return `
+                        <button class="action-btn video-btn" onclick="loadVideo('${data}', this)">
+                            <i class="fas fa-video"></i> Load Video
+                        </button>
+                        <div class="video-container" style="display:none;"></div>`;
+                }
+            },
+            { 
+                data: null,
+                title: 'Actions',
+                width: '25%',
+                render: function(data, type, row) {
+                    return `
+                        <div class="table-actions">
+                            <button class="action-btn view-btn" onclick="window.open('${row.ad_snapshot_url}', '_blank')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="action-btn filter-btn" onclick="filterAd('${row.id}')">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                            <button class="action-btn filter-page-btn" onclick="filterPage('${row.page_name}')">
+                                <i class="fas fa-building"></i> Filter Page
+                            </button>
+                        </div>`;
+                }
+            }
+        ],
+        pageLength: 25,
+        order: [[0, 'desc']],
+        responsive: true,
+        autoWidth: false,
+        scrollX: true,
+        dom: 'rt<"bottom"ip>',
+        language: {
+            search: ''
+        }
+    });
 }
 
 function initializeDataTable() {
@@ -268,22 +311,36 @@ function downloadCSV() {
 }
 
 async function loadAllVideos() {
+    const button = document.querySelector('.load-all-videos-btn');
+    
+    if (isLoadingVideos) {
+        // If currently loading, stop the process
+        isLoadingVideos = false;
+        button.innerHTML = '<i class="fas fa-play-circle"></i> Load All Videos';
+        button.classList.remove('loading');
+        return;
+    }
+
     const videoButtons = document.querySelectorAll('.action-btn.video-btn');
     if (!videoButtons.length) {
         showSuccessToast('No videos to load');
         return;
     }
 
-    const loadAllBtn = document.querySelector('.load-all-videos-btn');
-    if (loadAllBtn) {
-        loadAllBtn.disabled = true;
-        loadAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading Videos (0/' + videoButtons.length + ')';
-    }
+    // Start loading videos
+    isLoadingVideos = true;
+    button.innerHTML = '<i class="fas fa-stop-circle"></i> Stop Loading';
+    button.classList.add('loading');
 
     let loadedCount = 0;
     const totalVideos = videoButtons.length;
     
     for (const button of videoButtons) {
+        if (!isLoadingVideos) {
+            // If stopped, break the loop
+            break;
+        }
+
         try {
             if (button.getAttribute('data-loaded') === 'true') continue;
 
@@ -310,8 +367,8 @@ async function loadAllVideos() {
                 }
             }
             
-            if (loadAllBtn) {
-                loadAllBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Loading Videos (${loadedCount}/${totalVideos})`;
+            if (isLoadingVideos) {
+                button.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Loading Videos (${loadedCount}/${totalVideos})`;
             }
             
             const delay = Math.random() * 1000 + 1000;
@@ -322,13 +379,13 @@ async function loadAllVideos() {
         }
     }
     
-    if (loadAllBtn) {
-        loadAllBtn.disabled = false;
-        loadAllBtn.innerHTML = '<i class="fas fa-play-circle"></i> Load All Videos';
-    }
+    // Reset button state after completion or stop
+    isLoadingVideos = false;
+    button.innerHTML = '<i class="fas fa-play-circle"></i> Load All Videos';
+    button.classList.remove('loading');
+    
     showSuccessToast(`Loaded ${loadedCount} videos`);
 }
-
 // Make sure the loadVideo function is properly defined
 async function loadVideo(url, buttonElement) {
     try {
@@ -426,32 +483,43 @@ async function updateAccessTokens() {
 
     showSuccessToast('Access token updated successfully');
 }
-
 function filterAd(adId) {
+    // Add to filtered set
     filteredAds.add(adId);
-    adsTable.row(`tr[data-ad-id="${adId}"]`).remove().draw();
-    updateFilteredView();
+    
+    // Remove the row using DataTables API
+    adsTable.rows((idx, data) => data.id === adId)
+        .remove()
+        .draw();
+    
+    updateFilteredView(false); // Add false parameter to prevent modal from showing
 }
 
 function filterPage(pageName) {
+    // Add to filtered pages set
     filteredPages.add(pageName);
-    adsTable.rows().every(function() {
-        const data = this.data();
-        if (data[2] === pageName) { // Assuming page name is in the third column
-            this.remove();
+    
+    // Remove all rows with matching page name
+    adsTable.rows((idx, data) => {
+        if (data.page_name === pageName) {
+            filteredAds.add(data.id); // Add each ad to filtered set
+            return true; // Return true to remove this row
         }
-    });
-    adsTable.draw();
-    updateFilteredView();
+        return false;
+    })
+    .remove()
+    .draw();
+    
+    updateFilteredView(false); // Add false parameter to prevent modal from showing
 }
 
 function openFilteredView() {
     const modal = document.getElementById('filteredModal');
     modal.style.display = 'block';
-    updateFilteredView();
+    updateFilteredView(true); // Add true parameter to show modal
 }
 
-function updateFilteredView() {
+function updateFilteredView(showModal = false) { // Add showModal parameter with default value
     const filteredPagesDiv = document.getElementById('filteredPages');
     const filteredAdsDiv = document.getElementById('filteredAds');
 
@@ -484,6 +552,11 @@ function updateFilteredView() {
             </div>
         `;
     }).join('');
+
+    // Only show modal if explicitly requested
+    if (showModal) {
+        document.getElementById('filteredModal').style.display = 'block';
+    }
 }
 
 function unfilterAd(adId) {
@@ -492,7 +565,7 @@ function unfilterAd(adId) {
     if (ad) {
         adsTable.row.add($(createTableRow(ad))).draw();
     }
-    updateFilteredView();
+    updateFilteredView(false);
 }
 
 function unfilterPage(pageName) {
@@ -503,7 +576,7 @@ function unfilterPage(pageName) {
         }
     });
     adsTable.draw();
-    updateFilteredView();
+    updateFilteredView(false);
 }
 
 function closeFilteredView() {
@@ -700,24 +773,85 @@ async function loadVideo(url, buttonElement) {
     }
 }
 
-// Add these filtering functions
 function filterAd(adId) {
-    const row = adsTable.row($(`#resultsTable tr[data-ad-id="${adId}"]`));
-    if (row.length) {
-        filteredAds.add(adId);
-        row.remove().draw();
+    // Add to filtered set
+    filteredAds.add(adId);
+    
+    // Remove the row using DataTables API
+    adsTable.rows((idx, data) => data.id === adId)
+        .remove()
+        .draw();
+    
+    updateFilteredView();
+}
+
+function unfilterAd(adId) {
+    if (filteredAds.has(adId)) {
+        filteredAds.delete(adId);
+        // Find the ad data from currentAdsData
+        const adData = currentAdsData.find(ad => ad.id === adId);
+        if (adData) {
+            // Add the row back to the table
+            adsTable.row.add(createTableRow(adData)).draw();
+        }
         updateFilteredView();
     }
 }
 
 function filterPage(pageName) {
-    const rows = adsTable.rows().nodes().filter(row => {
-        return $(row).find('td:nth-child(2)').text() === pageName;
-    });
+    // Add to filtered pages set
+    filteredPages.add(pageName);
     
-    if (rows.length) {
-        filteredPages.add(pageName);
-        adsTable.rows(rows).remove().draw();
+    // Remove all rows with matching page name
+    adsTable.rows((idx, data) => {
+        if (data.page_name === pageName) {
+            filteredAds.add(data.id); // Add each ad to filtered set
+            return true; // Return true to remove this row
+        }
+        return false;
+    })
+    .remove()
+    .draw();
+    
+    updateFilteredView();
+}
+
+// Helper function to create table row from ad data
+function createTableRow(ad) {
+    return [
+        ad.ad_creation_time,
+        ad.page_name,
+        ad.eu_total_reach,
+        `<div class="video-container" id="video-${ad.id}">
+            <button class="action-btn video-btn" onclick="loadVideo('${ad.ad_snapshot_url}', this)" data-url="${ad.ad_snapshot_url}">
+                <i class="fas fa-play"></i> Load Video
+            </button>
+        </div>`,
+        `<div class="table-actions">
+            <a href="${ad.ad_snapshot_url}" target="_blank" class="action-btn view-btn">
+                <i class="fas fa-external-link-alt"></i> View
+            </a>
+            <button onclick="filterAd('${ad.id}')" class="action-btn filter-btn">
+                <i class="fas fa-filter"></i> Filter
+            </button>
+            <button onclick="filterPage('${ad.page_name}')" class="action-btn filter-page-btn">
+                <i class="fas fa-filter"></i> Filter Page
+            </button>
+        </div>`
+    ];
+}
+
+function unfilterPage(pageName) {
+    if (filteredPages.has(pageName)) {
+        filteredPages.delete(pageName);
+        // Add back all ads for this page
+        currentAdsData.forEach(ad => {
+            if (ad.page_name === pageName && filteredAds.has(ad.id)) {
+                filteredAds.delete(ad.id);
+                adsTable.row.add(createTableRow(ad));
+            }
+        });
+        adsTable.draw();
         updateFilteredView();
     }
 }
@@ -817,7 +951,6 @@ async function loadSavedSearches() {
         showErrorToast('Failed to load saved searches');
     }
 }
-
 // Update the toggle function
 function toggleSavedSearches() {
     const sidebar = document.querySelector('.saved-searches-sidebar');
@@ -898,3 +1031,5 @@ function showErrorToast(message) {
 function showWarningToast(message) {
     showToast(message, 'warning');
 }
+
+
