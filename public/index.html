@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Facebook Ads Data Fetcher</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-chart-bar"></i> FB Ads Fetcher</h2>
+            </div>
+            <div class="sidebar-content">
+                <form class="search-form" id="searchForm">
+                    <div class="form-group">
+                        <label for="access_token">Access Token</label>
+                        <input type="password" id="access_token" name="access_token" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="search_terms">Search Terms</label>
+                        <input type="text" id="search_terms" placeholder="Enter search terms">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ad_active_status">Ad Status</label>
+                        <select id="ad_active_status">
+                            <option value="ALL">All</option>
+                            <option value="ACTIVE">Active</option>
+                            <option value="INACTIVE">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ad_delivery_date_min">Start Date</label>
+                        <input type="date" id="ad_delivery_date_min">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ad_reached_countries">Country Code</label>
+                        <input type="text" id="ad_reached_countries" value="DE" placeholder="e.g., DE">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fields">Fields</label>
+                        <input type="text" id="fields" class="wide-input" 
+                               value="ad_creation_time,page_name,ad_snapshot_url,eu_total_reach">
+                    </div>
+
+                    <button type="submit" class="fetch-button">
+                        <i class="fas fa-download"></i> Fetch Data
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="results-actions">
+                <div class="token-update">
+                    <input type="text" id="newAccessToken" placeholder="New Access Token">
+                    <button onclick="updateAccessTokens()" class="update-token-btn">
+                        <i class="fas fa-key"></i> Update Access Token
+                    </button>
+                </div>
+                <div class="results-buttons">
+                    <button onclick="saveCurrentSearch()" class="save-search-btn">
+                        <i class="fas fa-save"></i> Save Search
+                    </button>
+                    <button onclick="downloadCSV()" class="download-csv-btn">
+                        <i class="fas fa-download"></i> Download CSV
+                    </button>
+                    <button onclick="openFilteredView()" class="filtered-view-btn">
+                        <i class="fas fa-filter"></i> Filtered
+                    </button>
+                    <button onclick="toggleSavedSearches()" class="view-saved-btn">
+                        <i class="fas fa-history"></i> Saved Searches
+                    </button>
+                </div>
+            </div>
+            <div id="results" class="results-container" style="display: none">
+                <div id="tableView" class="view-section">
+                    <table id="resultsTable" class="display nowrap">
+                        <thead>
+                            <tr>
+                                <th>Creation Date</th>
+                                <th>Page Name</th>
+                                <th>EU Total Reach</th>
+                                <th>Video</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay" style="display: none">
+        <div class="loader">
+            <div class="loader-spinner"></div>
+            <p id="loadingText">Fetching ads...</p>
+        </div>
+    </div>
+
+    <div id="fieldsHelp" class="modal" style="display: none">
+        <div class="modal-content">
+            <h3>Available Fields</h3>
+            <div class="fields-list">
+                <div class="field-item">
+                    <code>ad_creation_time</code>
+                    <span>When the ad was created</span>
+                </div>
+                <div class="field-item">
+                    <code>eu_total_reach</code>
+                    <span>Total reach in EU countries</span>
+                </div>
+            </div>
+            <button onclick="hideFieldsHelp()" class="close-modal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="filteredModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Filtered Items</h3>
+                <button onclick="closeFilteredView()" class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="filter-section">
+                    <h4>Filtered Pages</h4>
+                    <div class="search-bar">
+                        <input type="text" id="pageSearch" placeholder="Search page names...">
+                        <select id="reachSort">
+                            <option value="">Sort by Reach</option>
+                            <option value="asc">Lowest to Highest</option>
+                            <option value="desc">Highest to Lowest</option>
+                        </select>
+                    </div>
+                    <div id="filteredPages"></div>
+                </div>
+                <div class="filter-section">
+                    <h4>Filtered Ads</h4>
+                    <div id="filteredAds"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="saved-searches-sidebar">
+        <div class="sidebar-header">
+            <h3>Saved Searches</h3>
+            <button onclick="toggleSavedSearches()" class="close-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="searchesList" class="searches-list">
+            <!-- Saved searches will be loaded here -->
+        </div>
+    </div>
+
+    <script src="/app.js"></script>
+</body>
+</html>
