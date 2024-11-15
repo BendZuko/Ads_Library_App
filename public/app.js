@@ -215,16 +215,6 @@ function hideLoading() {
     document.getElementById('loadingOverlay').style.display = 'none';
 }
 
-function showErrorToast(message) {
-    // Implement toast notification
-    alert(message); // For now, using alert
-}
-
-function showSuccessToast(message) {
-    // Implement toast notification
-    alert(message); // For now, using alert
-}
-
 function formatDate(dateString) {
     return new Date(dateString).toLocaleDateString();
 }
@@ -277,29 +267,121 @@ function downloadCSV() {
     document.body.removeChild(link);
 }
 
-// Add this new function
 async function loadAllVideos() {
-    const videoButtons = document.querySelectorAll('button[onclick^="fetchVideo"]');
+    const videoButtons = document.querySelectorAll('.action-btn.video-btn');
+    if (!videoButtons.length) {
+        showSuccessToast('No videos to load');
+        return;
+    }
+
+    const loadAllBtn = document.querySelector('.load-all-videos-btn');
+    if (loadAllBtn) {
+        loadAllBtn.disabled = true;
+        loadAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading Videos (0/' + videoButtons.length + ')';
+    }
+
     let loadedCount = 0;
-    
-    showLoading();
-    document.getElementById('loadingText').textContent = `Loading videos (0/${videoButtons.length})...`;
+    const totalVideos = videoButtons.length;
     
     for (const button of videoButtons) {
         try {
-            // Extract URL from onclick attribute
-            const url = button.getAttribute('onclick').match(/'([^']+)'/)[1];
-            await fetchVideo(url, button);
-            loadedCount++;
-            document.getElementById('loadingText').textContent = 
-                `Loading videos (${loadedCount}/${videoButtons.length})...`;
+            if (button.getAttribute('data-loaded') === 'true') continue;
+
+            const onclickAttr = button.getAttribute('onclick');
+            const urlMatch = onclickAttr.match(/loadVideo\('([^']+)'/);
+            if (!urlMatch) continue;
+            
+            const url = urlMatch[1];
+            const videoContainer = button.closest('td').querySelector('.video-container');
+            
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            
+            // Attempt to load video
+            try {
+                await loadVideo(url, button);
+                loadedCount++;
+            } catch (error) {
+                // Handle error inline
+                button.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Failed';
+                button.style.background = 'var(--error-color)';
+                if (videoContainer) {
+                    videoContainer.innerHTML = `<div class="error-message">Failed to load video: ${error.message}</div>`;
+                }
+            }
+            
+            if (loadAllBtn) {
+                loadAllBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Loading Videos (${loadedCount}/${totalVideos})`;
+            }
+            
+            const delay = Math.random() * 1000 + 1000;
+            await new Promise(resolve => setTimeout(resolve, delay));
+            
         } catch (error) {
             console.error('Error loading video:', error);
         }
     }
     
-    hideLoading();
+    if (loadAllBtn) {
+        loadAllBtn.disabled = false;
+        loadAllBtn.innerHTML = '<i class="fas fa-play-circle"></i> Load All Videos';
+    }
     showSuccessToast(`Loaded ${loadedCount} videos`);
+}
+
+// Make sure the loadVideo function is properly defined
+async function loadVideo(url, buttonElement) {
+    try {
+        const videoContainer = buttonElement.nextElementSibling;
+        
+        // If video is already loaded, just toggle visibility
+        if (videoContainer.innerHTML !== '') {
+            videoContainer.style.display = videoContainer.style.display === 'none' ? 'block' : 'none';
+            return;
+        }
+
+        buttonElement.disabled = true;
+        buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+
+        // Fetch video URL
+        const response = await fetch('/api/fetch-video', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url })
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch video URL');
+        const { videoUrl } = await response.json();
+
+        // Download video
+        const downloadResponse = await fetch('/api/download-video', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ video_url: videoUrl })
+        });
+
+        if (!downloadResponse.ok) throw new Error('Failed to download video');
+        const { video_url } = await downloadResponse.json();
+
+        // Create and show video element
+        videoContainer.innerHTML = `
+            <video controls style="width: 100%; max-width: 400px;">
+                <source src="${video_url}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>`;
+        videoContainer.style.display = 'block';
+        
+        // Mark as loaded and update button
+        buttonElement.setAttribute('data-loaded', 'true');
+        buttonElement.innerHTML = '<i class="fas fa-video"></i> Toggle Video';
+        buttonElement.disabled = false;
+
+    } catch (error) {
+        console.error('Error loading video:', error);
+        buttonElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Failed';
+        buttonElement.disabled = false;
+        throw error;
+    }
 }
 
 // Update the updateAccessTokens function
@@ -778,3 +860,41 @@ async function deleteSavedSearch(searchId) {
     }
 }
 
+function showToast(message, type = 'success') {
+    // Remove any existing toasts
+    const existingToasts = document.querySelectorAll('.toast');
+    existingToasts.forEach(toast => toast.remove());
+
+    // Create new toast
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.style.opacity = '1';
+    toast.innerHTML = `
+        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+        <span>${message}</span>
+    `;
+
+    document.body.appendChild(toast);
+
+    // Remove toast after 3 seconds with fade out
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => {
+            if (toast && toast.parentElement) {
+                toast.remove();
+            }
+        }, 300); // Wait for fade out animation
+    }, 3000);
+}
+
+function showSuccessToast(message) {
+    showToast(message, 'success');
+}
+
+function showErrorToast(message) {
+    showToast(message, 'error');
+}
+
+function showWarningToast(message) {
+    showToast(message, 'warning');
+}
