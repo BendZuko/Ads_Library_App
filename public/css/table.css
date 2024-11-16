@@ -92,7 +92,8 @@
 
 /* Remove default DataTables buttons */
 .dt-buttons {
-    display: none !important;
+    display: inline-flex !important;
+    margin-left: 16px !important;
 }
 
 /* Video column specific styles */
@@ -125,4 +126,123 @@
     display: flex;
     justify-content: flex-end;
     padding: 0 16px;
+}
+
+/* Add these styles at the end of your existing table.css */
+
+.top.d-flex {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 15px 16px;
+    flex-wrap: nowrap !important;
+    width: 100%;
+}
+
+.left-controls {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+}
+
+.right-controls {
+    display: flex !important;
+    align-items: center !important;
+    margin-left: auto !important;
+}
+
+.dataTables_length {
+    display: flex !important;
+    align-items: center !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+}
+
+.dataTables_length label {
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.dataTables_length select {
+    margin: 0 8px !important;
+    height: 30px !important;
+    padding: 2px 20px 2px 8px !important;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+}
+
+/* Hide the default info display since we're including it in the length menu */
+.dataTables_info {
+    display: none !important;
+}
+
+.load-all-videos-btn {
+    background: var(--primary-color) !important;
+    color: white !important;
+    padding: 6px 12px !important;
+    border: none !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+}
+
+.load-all-videos-btn:hover {
+    background: var(--primary-hover) !important;
+    transform: translateY(-1px) !important;
+}
+
+.load-all-videos-btn.loading {
+    background: var(--error-color) !important;
+}
+
+.load-all-videos-btn.loading:hover {
+    background: #dc2626 !important;
+}
+
+/* Update the header cell containing the button */
+#resultsTable th:nth-child(4) {
+    display: table-cell;  /* Reset to default table cell display */
+}
+
+/* Style for the button inside the header */
+#resultsTable .load-all-videos-btn {
+    position: static;
+    transform: none;
+    margin: 0;
+}
+
+/* Make sure the video column header has relative positioning */
+#resultsTable th:nth-child(4) {
+    position: static;
+}
+
+/* Clean up the length control */
+.dataTables_length {
+    margin: 0 !important;
+    white-space: nowrap !important;
+}
+
+/* Remove absolute positioning from load-all-videos-btn */
+#resultsTable .load-all-videos-btn {
+    position: static;
+    transform: none;
+    margin: 0;
+}
+
+/* Clean up any floating issues */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_processing,
+.dataTables_wrapper .dataTables_paginate {
+    float: none !important;
 }

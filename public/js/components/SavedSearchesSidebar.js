@@ -2,6 +2,7 @@ import { state } from '../app.js';
 import { showSuccessToast, showErrorToast } from './Toast.js';
 import { updateResults } from '../pages/ResultsPage.js';
 import { updateAccessTokens } from './FormHandler.js';
+import { updateFilteredView } from './FilteredModal.js';
 
 export async function saveCurrentSearch() {
     const searchName = prompt('Enter a name for this search:');

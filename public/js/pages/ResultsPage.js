@@ -73,11 +73,21 @@ export function initializeDataTable() {
                 }
             ],
             pageLength: 25,
+            lengthMenu: [[25, 100, 500, -1], ['25', '100', '500', 'All']],
             order: [[0, 'desc']],
             responsive: true,
             autoWidth: false,
             scrollX: true,
-            dom: '<"table-controls"><"clear">rt<"bottom"ip>',
+            dom: '<"top d-flex"<"left-controls"l><"right-controls"B>><"clear">rt<"bottom"lip>',
+            buttons: [
+                {
+                    text: '<i class="fas fa-play-circle"></i> Load All Videos',
+                    className: 'load-all-videos-btn',
+                    action: function () {
+                        loadAllVideos();
+                    }
+                }
+            ],
             columnDefs: [
                 { targets: '_all', orderable: true }
             ],
@@ -85,7 +95,11 @@ export function initializeDataTable() {
                 $(this).find('.dataTables_scrollHead').css('overflow', 'hidden');
                 $(this).find('.dataTables_scrollBody').css('overflow', 'hidden');
             },
-            stretchH: 'all'
+            stretchH: 'all',
+            language: {
+                lengthMenu: `Show _MENU_ entries of ${state.currentAdsData.length}`,
+                info: ''  // Hide the default info text
+            }
         });
         
         state.adsTable = table;
