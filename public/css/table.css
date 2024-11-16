@@ -49,7 +49,7 @@
 #resultsTable th:nth-child(3),
 #resultsTable td:nth-child(3) {
     width: 12%;
-    text-align: center !important;
+    text-align: right !important;
     white-space: nowrap;
 }
 
@@ -168,10 +168,22 @@
 .dataTables_length select {
     margin: 0 8px !important;
     height: 30px !important;
-    padding: 2px 20px 2px 8px !important;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: white;
+    min-width: 60px !important;
+    padding: 2px 8px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+    background-color: transparent !important;
+    position: static !important;
+    z-index: auto !important;
+    appearance: menulist !important;
+    -webkit-appearance: menulist !important;
+    -moz-appearance: menulist !important;
+}
+
+/* Remove any pseudo-elements that might be causing the overlay */
+.dataTables_length select::before,
+.dataTables_length select::after {
+    display: none !important;
 }
 
 /* Hide the default info display since we're including it in the length menu */
@@ -245,4 +257,80 @@
 .dataTables_wrapper .dataTables_processing,
 .dataTables_wrapper .dataTables_paginate {
     float: none !important;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+    float: none !important;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+    width: 100%;
+    padding-right: 16px;
+}
+
+/* Add these specific styles for the pagination container */
+.dataTables_wrapper .bottom {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 0 16px !important;
+}
+
+/* Style the length (entries per page) container */
+.dataTables_wrapper .dataTables_length {
+    float: none !important;
+    display: flex;
+    align-items: center;
+}
+
+/* Style the pagination container */
+.dataTables_wrapper .dataTables_paginate {
+    float: none !important;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+    padding-right: 0;
+}
+
+/* Update the bottom controls layout */
+.dataTables_wrapper .bottom {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 0 16px !important;
+}
+
+/* Style for both top and bottom left controls */
+.left-controls {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+}
+
+/* Style for the length selector and stats in both top and bottom */
+.dataTables_length {
+    display: flex !important;
+    align-items: center !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+}
+
+.total-entries,
+.total-entries-bottom {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin-left: 16px !important;
+    white-space: nowrap !important;
+}
+
+/* Keep pagination on the right */
+.right-controls {
+    margin-left: auto !important;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+    margin: 0 !important;
 }

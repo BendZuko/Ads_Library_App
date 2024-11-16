@@ -1,12 +1,12 @@
 {
   "name": "51",
-  "timestamp": "2024-11-16T08:26:17.525Z",
+  "timestamp": "2024-11-16T11:04:07.397Z",
   "parameters": {
     "access_token": "EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
-    "search_terms": "kaliteas.de",
-    "ad_active_status": "ALL",
+    "search_terms": "Lyonnais Boutique",
+    "ad_active_status": "ACTIVE",
     "ad_delivery_date_min": "2024-11-14",
-    "ad_reached_countries": "DE",
+    "ad_reached_countries": "FR",
     "fields": "ad_creation_time,page_name,ad_snapshot_url,eu_total_reach"
   },
   "results": [
@@ -364,7 +364,10 @@
   "filtered": {
     "pages": [],
     "ads": [
-      "2260501227676055"
+      "2260501227676055",
+      "1334153940899970",
+      "2932789483551553",
+      "3889795031232283"
     ]
   }
 }

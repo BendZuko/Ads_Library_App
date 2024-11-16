@@ -1,5 +1,6 @@
 import { state } from '../app.js';
 import { showErrorToast, showSuccessToast, showWarningToast } from '../components/Toast.js';
+import { updateTableStats } from '../components/FilteredModal.js';
 
 let isLoadingVideos = false;
 let loadingInterval = null;
@@ -73,12 +74,15 @@ export function initializeDataTable() {
                 }
             ],
             pageLength: 25,
-            lengthMenu: [[25, 100, 500, -1], ['25', '100', '500', 'All']],
+            lengthMenu: [
+                [25, 100, 500, -1],
+                ['25', '100', '500', 'All']
+            ],
             order: [[0, 'desc']],
             responsive: true,
             autoWidth: false,
             scrollX: true,
-            dom: '<"top d-flex"<"left-controls"l><"right-controls"B>><"clear">rt<"bottom"lip>',
+            dom: '<"top d-flex justify-content-between"<"left-controls"<"dataTables_length"l><"total-entries">><"right-controls"B>><"clear">rt<"bottom d-flex justify-content-between"<"left-controls"<"dataTables_length"l><"total-entries-bottom">><"right-controls"p>>',
             buttons: [
                 {
                     text: '<i class="fas fa-play-circle"></i> Load All Videos',
@@ -94,11 +98,16 @@ export function initializeDataTable() {
             fnInitComplete: function() {
                 $(this).find('.dataTables_scrollHead').css('overflow', 'hidden');
                 $(this).find('.dataTables_scrollBody').css('overflow', 'hidden');
+                
+                // Add total entries count with filtered stats to both top and bottom
+                const stats = updateTableStats(this.api().data().length);
+                $('.total-entries, .total-entries-bottom').html(stats);
             },
             stretchH: 'all',
             language: {
-                lengthMenu: `Show _MENU_ entries of ${state.currentAdsData.length}`,
-                info: ''  // Hide the default info text
+                lengthMenu: '_MENU_ per page',
+                info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+                infoFiltered: '(filtered from _MAX_ total entries)'
             }
         });
         
@@ -280,12 +289,26 @@ export function updateResults(ads) {
     }
 
     state.currentAdsData = ads;
+    
+    // Filter out ads that should be hidden based on current filters
+    const visibleAds = ads.filter(ad => {
+        // Hide if the ad is filtered
+        if (state.filteredAds.has(ad.id)) return false;
+        // Hide if the ad's page is filtered
+        if (state.filteredPages.has(ad.page_name)) {
+            state.filteredAds.add(ad.id); // Make sure to track these filtered ads
+            return false;
+        }
+        return true;
+    });
+
+    // Initialize table with filtered data
     state.adsTable = initializeDataTable();
     
     console.log('Adding rows to table');
     state.adsTable.clear();
     
-    const transformedData = ads.map(ad => ({
+    const transformedData = visibleAds.map(ad => ({
         ad_creation_time: ad.ad_creation_time,
         page_name: ad.page_name,
         eu_total_reach: ad.eu_total_reach,
@@ -294,6 +317,13 @@ export function updateResults(ads) {
     }));
     
     state.adsTable.rows.add(transformedData).draw();
+    
+    // Add a small delay before updating stats
+    setTimeout(() => {
+        updateTableStats();
+        console.log('Stats updated after delay');
+    }, 100); // 100ms delay
+    
     console.log('Table updated');
 }
 

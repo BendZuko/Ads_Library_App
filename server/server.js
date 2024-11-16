@@ -46,13 +46,13 @@ const SAVED_SEARCHES_DIR = path.join(DATA_FOLDER, 'saved_searches');
 // Route to fetch ads from Facebook's Ad Library API
 app.post('/api/fetch-ads', async (req, res) => {
     try {
-        // Extract query parameters
         const {
             access_token,
             search_terms,
             ad_active_status,
             ad_delivery_date_min,
             ad_reached_countries,
+            ad_language,
             fields
         } = req.body;
 
@@ -60,32 +60,84 @@ app.post('/api/fetch-ads', async (req, res) => {
             return res.status(400).json({ error: { message: 'Access token is required' }});
         }
 
-        // Create URL parameters
-        const params = new URLSearchParams({
-            access_token,
-            search_terms,
-            ad_active_status,
-            ad_delivery_date_min,
-            ad_reached_countries,
-            fields
-        });
-
-        // Logging (with hidden token for security)
-        console.log('Making request to Facebook API with params:', {
-            ...Object.fromEntries(params),
-            access_token: '***hidden***'
-        });
-
-        const response = await axios.get(
-            `https://graph.facebook.com/v18.0/ads_archive?${params.toString()}`
-        );
-
-        console.log('Received response with', response.data.data?.length || 0, 'ads');
+        let allAds = [];
+        let pageCount = 0;
         
-        res.json(response.data);
+        // Construct initial URL with parameters
+        let baseUrl = 'https://graph.facebook.com/v18.0/ads_archive';
+        let params = new URLSearchParams({
+            access_token,
+            search_terms: search_terms || '',
+            ad_active_status: ad_active_status || 'ALL',
+            ad_delivery_date_min: ad_delivery_date_min || '',
+            ad_reached_countries: ad_reached_countries || '',
+            languages: ad_language ? [ad_language] : [],
+            fields: fields || '',
+        });
+
+        let nextPage = `${baseUrl}?${params.toString()}`;
+        console.log('Initial URL:', nextPage);
+
+        while (nextPage && pageCount < 10) {
+            pageCount++;
+            console.log(`\nFetching page ${pageCount}...`);
+            
+            try {
+                // Always ensure ad_language is in the URL
+                const currentUrl = new URL(nextPage);
+                if (ad_language) {
+                    currentUrl.searchParams.set('languages', [ad_language]);
+                }
+                nextPage = currentUrl.toString();
+                
+                const response = await axios.get(nextPage);
+                
+                if (!response.data || !response.data.data) {
+                    console.error('Invalid response:', response.data);
+                    break;
+                }
+
+                const pageAds = response.data.data;
+                console.log(`Page ${pageCount}: Retrieved ${pageAds.length} ads`);
+                allAds = [...allAds, ...pageAds];
+                
+                // Get next page URL and ensure it includes ad_language
+                nextPage = response.data.paging?.next || null;
+                if (nextPage) {
+                    const nextUrl = new URL(nextPage);
+                    if (ad_language) {
+                        nextUrl.searchParams.set('languages', [ad_language]);
+                    }
+                    nextPage = nextUrl.toString();
+                }
+                
+                console.log('Next page URL:', nextPage);
+
+                if (!nextPage) {
+                    console.log('No more pages to fetch');
+                    break;
+                }
+
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+            } catch (error) {
+                console.error(`Error fetching page ${pageCount}:`, error.response?.data || error);
+                break;
+            }
+        }
+
+        console.log('\nFinal response:', {
+            totalAds: allAds.length,
+            totalPages: pageCount
+        });
+        
+        res.json({
+            data: allAds,
+            paging: null  // We've already fetched all pages
+        });
 
     } catch (error) {
-        console.error('Error fetching ads:', error.response?.data || error);
+        console.error('Error in fetch-ads:', error.response?.data || error);
         res.status(error.response?.status || 500).json({ 
             error: {
                 message: error.response?.data?.error?.message || 'Failed to fetch ads',

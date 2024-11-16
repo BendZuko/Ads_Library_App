@@ -2,6 +2,47 @@ import { state } from '../app.js';
 import { showErrorToast, showSuccessToast } from './Toast.js';
 import { updateResults } from '../pages/ResultsPage.js';
 
+const COUNTRY_MAPPING = {
+    'US': 'United States',
+    'DE': 'Germany',
+    'FR': 'France',
+    'NL': 'Netherlands',
+    'GB': 'United Kingdom',
+    'SE': 'Sweden',
+    'NO': 'Norway',
+    'FI': 'Finland',
+    'DK': 'Denmark',
+    'IT': 'Italy',
+    'ES': 'Spain',
+    'KR': 'South Korea',
+    'BR': 'Brazil',
+    'AU': 'Australia',
+    'MX': 'Mexico',
+    'ID': 'Indonesia',
+    'SA': 'Saudi Arabia',
+    'TR': 'Turkey',
+    'JP': 'Japan',
+    'IN': 'India'
+};
+
+const LANGUAGE_MAPPING = {
+    'en': 'English',
+    'es': 'Spanish',
+    'fr': 'French',
+    'de': 'German',
+    'zh': 'Chinese (Simplified)',
+    'ar': 'Arabic',
+    'pt': 'Portuguese',
+    'ru': 'Russian',
+    'ja': 'Japanese',
+    'ko': 'Korean',
+    'it': 'Italian',
+    'hi': 'Hindi',
+    'nl': 'Dutch',
+    'sv': 'Swedish',
+    'tr': 'Turkish'
+};
+
 export function initializeForm() {
     const form = document.getElementById('searchForm');
     form.addEventListener('submit', handleFormSubmit);
@@ -15,6 +56,7 @@ export function loadSavedParameters() {
         ad_active_status: localStorage.getItem('fb_ad_active_status'),
         ad_delivery_date_min: localStorage.getItem('fb_ad_delivery_date_min'),
         ad_reached_countries: localStorage.getItem('fb_ad_reached_countries'),
+        ad_language: localStorage.getItem('fb_ad_language'),
         fields: localStorage.getItem('fb_fields')
     };
 
@@ -39,6 +81,7 @@ export async function handleFormSubmit(e) {
             ad_active_status: document.getElementById('ad_active_status').value,
             ad_delivery_date_min: document.getElementById('ad_delivery_date_min').value,
             ad_reached_countries: document.getElementById('ad_reached_countries').value,
+            ad_language: document.getElementById('ad_language').value,
             fields: document.getElementById('fields').value
         };
 

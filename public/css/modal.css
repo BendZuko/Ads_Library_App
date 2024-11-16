@@ -17,6 +17,15 @@
     max-width: 800px;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-lg);
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 8px;
 }
 
 .modal-header {
@@ -68,4 +77,11 @@
 .unfilter-btn:hover {
     background: #15803d;
     transform: translateY(-1px);
+}
+
+#filteredPages, 
+#filteredAds {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 4px;
 }
