@@ -2,19 +2,19 @@
 <html lang="en">
 <head>
     <title>Facebook Ads Data Fetcher</title>
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css">
+    
+    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -70,28 +70,28 @@
             <div class="results-actions">
                 <div class="token-update">
                     <input type="text" id="newAccessToken" placeholder="New Access Token">
-                    <button onclick="updateAccessTokens()" class="update-token-btn">
+                    <button class="update-token-btn">
                         <i class="fas fa-key"></i> Update Access Token
                     </button>
                 </div>
                 <div class="results-buttons">
-                    <button onclick="saveCurrentSearch()" class="save-search-btn">
+                    <button class="save-search-btn">
                         <i class="fas fa-save"></i> Save Search
                     </button>
-                    <button onclick="downloadCSV()" class="download-csv-btn">
+                    <button class="download-csv-btn">
                         <i class="fas fa-download"></i> Download CSV
                     </button>
-                    <button onclick="openFilteredView()" class="filtered-view-btn">
+                    <button class="filtered-view-btn">
                         <i class="fas fa-filter"></i> Filtered
                     </button>
-                    <button onclick="toggleSavedSearches()" class="view-saved-btn">
+                    <button class="view-saved-btn">
                         <i class="fas fa-history"></i> Saved Searches
                     </button>
                 </div>
             </div>
             <div id="results" class="results-container" style="display: none">
                 <div class="table-controls">
-                    <button onclick="loadAllVideos()" class="load-all-videos-btn">
+                    <button class="load-all-videos-btn">
                         <i class="fas fa-play-circle"></i> Load All Videos
                     </button>
                 </div>
@@ -166,7 +166,7 @@
         </div>
     </div>
 
-    <div class="saved-searches-sidebar">
+    <div id="savedSearchesSidebar" class="saved-searches-sidebar">
         <div class="sidebar-header">
             <h3>Saved Searches</h3>
             <button onclick="toggleSavedSearches()" class="close-btn">
@@ -178,6 +178,60 @@
         </div>
     </div>
 
-    <script src="/app.js"></script>
+    <!-- Module imports -->
+    <script type="module">
+        import { 
+            handleFormSubmit, 
+            updateResults, 
+            showSuccessToast, 
+            showErrorToast,
+            filterAd,
+            filterPage,
+            unfilterAd,
+            unfilterPage,
+            toggleSavedSearches,
+            loadSavedSearch,
+            saveCurrentSearch,
+            deleteSavedSearch,
+            loadAllVideos,
+            loadVideo,
+            downloadCSV,
+            openFilteredView,
+            closeFilteredView
+        } from './js/app.js';
+
+        import { updateAccessTokens } from './js/components/FormHandler.js';
+
+        // Make functions available globally
+        window.handleFormSubmit = handleFormSubmit;
+        window.updateResults = updateResults;
+        window.showSuccessToast = showSuccessToast;
+        window.showErrorToast = showErrorToast;
+        window.filterAd = filterAd;
+        window.filterPage = filterPage;
+        window.unfilterAd = unfilterAd;
+        window.unfilterPage = unfilterPage;
+        window.toggleSavedSearches = toggleSavedSearches;
+        window.loadSavedSearch = loadSavedSearch;
+        window.saveCurrentSearch = saveCurrentSearch;
+        window.deleteSavedSearch = deleteSavedSearch;
+        window.loadAllVideos = loadAllVideos;
+        window.loadVideo = loadVideo;
+        window.downloadCSV = downloadCSV;
+        window.openFilteredView = openFilteredView;
+        window.closeFilteredView = closeFilteredView;
+        window.updateAccessTokens = updateAccessTokens;
+
+        // Add all event listeners after DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('searchForm').addEventListener('submit', handleFormSubmit);
+            document.querySelector('.update-token-btn').addEventListener('click', updateAccessTokens);
+            document.querySelector('.save-search-btn').addEventListener('click', saveCurrentSearch);
+            document.querySelector('.download-csv-btn').addEventListener('click', downloadCSV);
+            document.querySelector('.filtered-view-btn').addEventListener('click', openFilteredView);
+            document.querySelector('.view-saved-btn').addEventListener('click', toggleSavedSearches);
+            document.querySelector('.load-all-videos-btn').addEventListener('click', loadAllVideos);
+        });
+    </script>
 </body>
 </html>

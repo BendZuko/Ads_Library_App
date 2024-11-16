@@ -10,11 +10,26 @@ const crypto = require('crypto');
 const app = express();
 
 // Configure server middleware
-app.use(cors());
 app.use(express.json());
-// Serve static files from public and static directories
-app.use(express.static(path.join(__dirname, '../public')));
-app.use('/static', express.static(path.join(__dirname, '../static')));
+app.use(cors());
+
+// Add middleware for proper MIME types
+app.use((req, res, next) => {
+    if (req.url.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+    }
+    next();
+});
+
+// Serve static files
+app.use('/', express.static(path.join(__dirname, '../public')));
+
+// Debug middleware
+app.use((req, res, next) => {
+    console.log(`Request: ${req.method} ${req.url}`);
+    console.log(`Looking for file: ${path.join(__dirname, '../public', req.url)}`);
+    next();
+});
 
 // Define important directory paths
 const UPLOAD_FOLDER = path.join(__dirname, '../static/videos');
@@ -26,12 +41,6 @@ const SAVED_SEARCHES_DIR = path.join(DATA_FOLDER, 'saved_searches');
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
     }
-});
-
-// Debug middleware
-app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path}`);
-    next();
 });
 
 // Route to fetch ads from Facebook's Ad Library API
@@ -96,19 +105,41 @@ app.post('/api/fetch-video', async (req, res) => {
 
     try {
         const browser = await puppeteer.launch({ 
-            headless: true,
+            headless: 'new',
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
         
         const page = await browser.newPage();
-        console.log(`Navigating to ${url}`);
         
-        await page.goto(url, { waitUntil: 'networkidle2' });
-
-        const videoUrl = await page.evaluate(() => {
-            const video = document.querySelector('video');
-            return video ? video.src : null;
+        // Set a reasonable timeout
+        await page.setDefaultNavigationTimeout(30000);
+        
+        // Enable request interception to capture video URLs
+        await page.setRequestInterception(true);
+        
+        let videoUrl = null;
+        
+        page.on('request', request => {
+            const url = request.url();
+            if (url.includes('.mp4') || url.includes('video')) {
+                videoUrl = url;
+            }
+            request.continue();
         });
+
+        console.log(`Navigating to ${url}`);
+        await page.goto(url, { 
+            waitUntil: 'networkidle0',
+            timeout: 30000
+        });
+
+        // If we didn't catch the video URL through requests, try to find it in the DOM
+        if (!videoUrl) {
+            videoUrl = await page.evaluate(() => {
+                const video = document.querySelector('video');
+                return video ? video.src : null;
+            });
+        }
 
         await browser.close();
 
@@ -119,7 +150,10 @@ app.post('/api/fetch-video', async (req, res) => {
         res.json({ videoUrl });
     } catch (error) {
         console.error('Error fetching video:', error);
-        res.status(500).json({ error: 'Failed to fetch video URL' });
+        res.status(500).json({ 
+            error: 'Failed to fetch video URL',
+            details: error.message 
+        });
     }
 });
 
@@ -238,10 +272,21 @@ app.delete('/api/saved-searches/:id', (req, res) => {
     }
 });
 
+// Add a catch-all route for SPA
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
 // Global error handler
 app.use((err, req, res, next) => {
     console.error('Unhandled error:', err);
     res.status(500).json({ error: 'Internal server error' });
+});
+
+// Debug middleware for static files
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path}`);
+    next();
 });
 
 // Start server

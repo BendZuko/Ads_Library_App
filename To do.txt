@@ -1,2 +1,16 @@
--Divide the app.js into multiple files (and delete it in the end)
+-Divide the app.js into multiple files and delete it in the end
 -Hire someone to build out the app and refactor the code in a structured and simple way
+
+
+
+
+
+
+
+
+
+
+
+Tree :
+
+tree --prune -I "node_modules|config|controllers|middleware|routes"

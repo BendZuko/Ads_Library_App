@@ -1,4 +1,6 @@
+/* Css Variables */
 :root {
+    /* Color Palette */
     --primary-color: #4f46e5;
     --primary-hover: #4338ca;
     --secondary-color: #64748b;
@@ -28,7 +30,7 @@ body {
     line-height: 1.6;
 }
 
-/* Layout */
+/* App Layout */
 .app-container {
     display: flex;
     flex-direction: column;
@@ -37,7 +39,7 @@ body {
     gap: 24px;
 }
 
-/* Sidebar (now top section) */
+/* Sidebar */
 .sidebar {
     background: white;
     border-radius: var(--border-radius);
@@ -70,7 +72,7 @@ body {
     box-shadow: var(--shadow-md);
 }
 
-/* Form Styles */
+/* Form Elements */
 .search-form {
     display: flex;
     flex-direction: column;
@@ -332,15 +334,46 @@ input:focus, select:focus {
 
 #resultsTable {
     width: 100% !important;
-    border-collapse: separate;
-    border-spacing: 0;
+    table-layout: fixed;
+}
+
+#resultsTable th:nth-child(1),
+#resultsTable td:nth-child(1) {
+    width: 10%;
+    text-align: center !important;
+}
+
+#resultsTable th:nth-child(2),
+#resultsTable td:nth-child(2) {
+    width: 15%;
+    text-align: center !important;
+}
+
+#resultsTable th:nth-child(3),
+#resultsTable td:nth-child(3) {
+    width: 12%;
+    text-align: center !important;
+}
+
+#resultsTable th:nth-child(4),
+#resultsTable td:nth-child(4) {
+    width: 38%;
+    text-align: center !important;
+}
+
+#resultsTable th:nth-child(5),
+#resultsTable td:nth-child(5) {
+    width: 25%;
+    text-align: center !important;
+    min-width: 250px;
 }
 
 #resultsTable thead th {
+    text-align: center !important;
+    vertical-align: middle !important;
     background: var(--background-gray);
     padding: 12px 16px;
     font-weight: 600;
-    text-align: center !important;
     border-bottom: 2px solid #e2e8f0;
     white-space: nowrap;
     position: sticky;
@@ -352,7 +385,6 @@ input:focus, select:focus {
     padding: 12px 16px;
     border-bottom: 1px solid #e2e8f0;
     vertical-align: middle;
-    text-align: center;
 }
 
 /* Action Buttons in Table */
@@ -1377,4 +1409,14 @@ table.dataTable td.dt-body-right {
 
 .load-all-videos-btn.loading:hover {
     background: #dc2626;
+}
+
+/* Ensure DataTables doesn't override our alignment */
+.dataTables_wrapper .dataTables_scrollHead table thead th {
+    text-align: center !important;
+}
+
+/* Remove any conflicting alignments */
+.dt-head-left, .dt-body-left {
+    text-align: center !important;
 }
