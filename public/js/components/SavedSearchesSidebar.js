@@ -7,32 +7,45 @@ export async function saveCurrentSearch() {
     const searchName = prompt('Enter a name for this search:');
     if (!searchName) return;
 
-    const searchData = {
-        name: searchName,
-        timestamp: new Date().toISOString(),
-        parameters: {
-            access_token: document.getElementById('access_token').value,
-            search_terms: document.getElementById('search_terms').value,
-            ad_active_status: document.getElementById('ad_active_status').value,
-            ad_delivery_date_min: document.getElementById('ad_delivery_date_min').value,
-            ad_reached_countries: document.getElementById('ad_reached_countries').value,
-            fields: document.getElementById('fields').value
-        },
-        results: state.currentAdsData,
-        filtered: {
-            pages: Array.from(state.filteredPages),
-            ads: Array.from(state.filteredAds)
-        }
-    };
-
     try {
-        const response = await fetch('/api/save-search', {
+        // Check if search with this name already exists
+        const response = await fetch('/api/saved-searches');
+        const searches = await response.json();
+        const existingSearch = searches.find(search => search.name === searchName);
+
+        if (existingSearch) {
+            if (!confirm(`A search with name "${searchName}" already exists. Do you want to override it?`)) {
+                return;
+            }
+            // If user confirms, delete the existing search
+            await deleteSavedSearch(existingSearch.id, false); // Add 'false' parameter to prevent confirmation dialog
+        }
+
+        const searchData = {
+            name: searchName,
+            timestamp: new Date().toISOString(),
+            parameters: {
+                access_token: document.getElementById('access_token').value,
+                search_terms: document.getElementById('search_terms').value,
+                ad_active_status: document.getElementById('ad_active_status').value,
+                ad_delivery_date_min: document.getElementById('ad_delivery_date_min').value,
+                ad_reached_countries: document.getElementById('ad_reached_countries').value,
+                fields: document.getElementById('fields').value
+            },
+            results: state.currentAdsData,
+            filtered: {
+                pages: Array.from(state.filteredPages),
+                ads: Array.from(state.filteredAds)
+            }
+        };
+
+        const saveResponse = await fetch('/api/save-search', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(searchData)
         });
 
-        if (!response.ok) throw new Error('Failed to save search');
+        if (!saveResponse.ok) throw new Error('Failed to save search');
         showSuccessToast('Search saved successfully');
         await loadSavedSearches();
     } catch (error) {
@@ -73,7 +86,33 @@ export async function loadSavedSearch(searchId) {
 
         state.currentAdsData = searchData.results;
         updateResults(searchData.results);
+        
+        // Display the search name
+        const searchNameContainer = document.querySelector('.current-search-name');
+        const searchNameSpan = document.getElementById('currentSearchName');
+        if (searchNameContainer && searchNameSpan) {
+            searchNameSpan.textContent = searchData.name;
+            searchNameContainer.style.display = 'block';
+        }
+
         showSuccessToast('Search loaded successfully');
+        
+        // Restore filters
+        state.filteredPages = new Set(searchData.filtered.pages);
+        state.filteredAds = new Set(searchData.filtered.ads);
+        
+        // Update the table to reflect filters
+        state.adsTable.clear();
+        state.currentAdsData.forEach(ad => {
+            if (!state.filteredAds.has(ad.id) && 
+                !state.filteredPages.has(ad.page_name)) {
+                state.adsTable.row.add(ad);
+            }
+        });
+        state.adsTable.draw();
+
+        // Update the filtered view modal
+        updateFilteredView();
         
     } catch (error) {
         console.error('Error loading saved search:', error);
@@ -126,8 +165,8 @@ async function loadSavedSearches() {
     }
 }
 
-export async function deleteSavedSearch(searchId) {
-    if (!confirm('Are you sure you want to delete this saved search?')) {
+export async function deleteSavedSearch(searchId, showConfirm = true) {
+    if (showConfirm && !confirm('Are you sure you want to delete this saved search?')) {
         return;
     }
     
@@ -140,9 +179,10 @@ export async function deleteSavedSearch(searchId) {
             throw new Error('Failed to delete search');
         }
         
-        showSuccessToast('Search deleted successfully');
-        await loadSavedSearches();
-        
+        if (showConfirm) {
+            showSuccessToast('Search deleted successfully');
+            await loadSavedSearches();
+        }
     } catch (error) {
         console.error('Error deleting search:', error);
         showErrorToast('Failed to delete search');

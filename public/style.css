@@ -1420,3 +1420,16 @@ table.dataTable td.dt-body-right {
 .dt-head-left, .dt-body-left {
     text-align: center !important;
 }
+
+.current-search-name {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+.current-search-name h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #333;
+}
