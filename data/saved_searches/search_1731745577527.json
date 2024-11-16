@@ -1,0 +1,370 @@
+{
+  "name": "51",
+  "timestamp": "2024-11-16T08:26:17.525Z",
+  "parameters": {
+    "access_token": "EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+    "search_terms": "kaliteas.de",
+    "ad_active_status": "ALL",
+    "ad_delivery_date_min": "2024-11-14",
+    "ad_reached_countries": "DE",
+    "fields": "ad_creation_time,page_name,ad_snapshot_url,eu_total_reach"
+  },
+  "results": [
+    {
+      "ad_creation_time": "2024-11-13",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=452256710831379&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 945,
+      "id": "452256710831379"
+    },
+    {
+      "ad_creation_time": "2024-11-13",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=539753502165840&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 599,
+      "id": "539753502165840"
+    },
+    {
+      "ad_creation_time": "2024-11-13",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=548175397914892&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 441,
+      "id": "548175397914892"
+    },
+    {
+      "ad_creation_time": "2024-11-13",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=581113437671528&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 1344,
+      "id": "581113437671528"
+    },
+    {
+      "ad_creation_time": "2024-11-13",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=875779941306394&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 76,
+      "id": "875779941306394"
+    },
+    {
+      "ad_creation_time": "2024-11-13",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=943016317863500&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 241,
+      "id": "943016317863500"
+    },
+    {
+      "ad_creation_time": "2024-11-13",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1752836035451542&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 706,
+      "id": "1752836035451542"
+    },
+    {
+      "ad_creation_time": "2024-11-12",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=566925419400615&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 226,
+      "id": "566925419400615"
+    },
+    {
+      "ad_creation_time": "2024-11-12",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=927566042582857&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 79,
+      "id": "927566042582857"
+    },
+    {
+      "ad_creation_time": "2024-11-12",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=940506337932556&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 754,
+      "id": "940506337932556"
+    },
+    {
+      "ad_creation_time": "2024-11-12",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1955238191642349&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 1040,
+      "id": "1955238191642349"
+    },
+    {
+      "ad_creation_time": "2024-11-12",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=2260501227676055&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 2071,
+      "id": "2260501227676055"
+    },
+    {
+      "ad_creation_time": "2024-11-12",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=3420722478234359&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 100,
+      "id": "3420722478234359"
+    },
+    {
+      "ad_creation_time": "2024-11-12",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=3930640330528386&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 270,
+      "id": "3930640330528386"
+    },
+    {
+      "ad_creation_time": "2024-11-11",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1066271271889478&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 982,
+      "id": "1066271271889478"
+    },
+    {
+      "ad_creation_time": "2024-11-11",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1588170258495841&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 1320,
+      "id": "1588170258495841"
+    },
+    {
+      "ad_creation_time": "2024-11-09",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=876978384522379&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 4904,
+      "id": "876978384522379"
+    },
+    {
+      "ad_creation_time": "2024-11-09",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=882226370716996&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 3235,
+      "id": "882226370716996"
+    },
+    {
+      "ad_creation_time": "2024-11-09",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=883873870559463&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 2175,
+      "id": "883873870559463"
+    },
+    {
+      "ad_creation_time": "2024-11-09",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1334153940899970&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 995,
+      "id": "1334153940899970"
+    },
+    {
+      "ad_creation_time": "2024-11-09",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=2932789483551553&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 1890,
+      "id": "2932789483551553"
+    },
+    {
+      "ad_creation_time": "2024-11-09",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=3367183503411726&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 8368,
+      "id": "3367183503411726"
+    },
+    {
+      "ad_creation_time": "2024-11-09",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=3889795031232283&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 130,
+      "id": "3889795031232283"
+    },
+    {
+      "ad_creation_time": "2024-11-08",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=538755199116370&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 2200,
+      "id": "538755199116370"
+    },
+    {
+      "ad_creation_time": "2024-11-08",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=541452305260861&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 1559,
+      "id": "541452305260861"
+    },
+    {
+      "ad_creation_time": "2024-11-08",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=578001151577177&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 430,
+      "id": "578001151577177"
+    },
+    {
+      "ad_creation_time": "2024-11-08",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=611862577834436&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 365,
+      "id": "611862577834436"
+    },
+    {
+      "ad_creation_time": "2024-11-08",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=897085098757644&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 309,
+      "id": "897085098757644"
+    },
+    {
+      "ad_creation_time": "2024-11-08",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1021314723016575&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 607,
+      "id": "1021314723016575"
+    },
+    {
+      "ad_creation_time": "2024-11-08",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1071607504205796&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 201,
+      "id": "1071607504205796"
+    },
+    {
+      "ad_creation_time": "2024-11-08",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1083319783286750&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 1438,
+      "id": "1083319783286750"
+    },
+    {
+      "ad_creation_time": "2024-11-08",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1090116386028690&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 682,
+      "id": "1090116386028690"
+    },
+    {
+      "ad_creation_time": "2024-11-08",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1097162111260105&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 987,
+      "id": "1097162111260105"
+    },
+    {
+      "ad_creation_time": "2024-11-08",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=8661236903969304&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 183,
+      "id": "8661236903969304"
+    },
+    {
+      "ad_creation_time": "2024-11-07",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1210538916905732&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 2686,
+      "id": "1210538916905732"
+    },
+    {
+      "ad_creation_time": "2024-11-06",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=415202394970369&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 177,
+      "id": "415202394970369"
+    },
+    {
+      "ad_creation_time": "2024-11-06",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=537881915731630&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 215,
+      "id": "537881915731630"
+    },
+    {
+      "ad_creation_time": "2024-11-06",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=544821944809785&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 726,
+      "id": "544821944809785"
+    },
+    {
+      "ad_creation_time": "2024-11-06",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=935433165120320&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 3508,
+      "id": "935433165120320"
+    },
+    {
+      "ad_creation_time": "2024-11-06",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1309056083453045&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 4209,
+      "id": "1309056083453045"
+    },
+    {
+      "ad_creation_time": "2024-11-06",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1729533407845704&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 1202,
+      "id": "1729533407845704"
+    },
+    {
+      "ad_creation_time": "2024-11-06",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=8896364410415509&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 272,
+      "id": "8896364410415509"
+    },
+    {
+      "ad_creation_time": "2024-11-06",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=9006910269348546&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 374,
+      "id": "9006910269348546"
+    },
+    {
+      "ad_creation_time": "2024-10-29",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=948520447098911&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 1063,
+      "id": "948520447098911"
+    },
+    {
+      "ad_creation_time": "2024-10-29",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1283069769513559&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 13856,
+      "id": "1283069769513559"
+    },
+    {
+      "ad_creation_time": "2024-10-15",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=738700208433486&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 48,
+      "id": "738700208433486"
+    },
+    {
+      "ad_creation_time": "2024-10-15",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=973516877829578&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 36058,
+      "id": "973516877829578"
+    },
+    {
+      "ad_creation_time": "2024-10-13",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=530762809557613&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 251069,
+      "id": "530762809557613"
+    },
+    {
+      "ad_creation_time": "2024-10-13",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=4325277971032309&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 238927,
+      "id": "4325277971032309"
+    },
+    {
+      "ad_creation_time": "2024-10-11",
+      "page_name": "Kaliteas.de",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1798603384006529&access_token=EAA0PtZAaDyj8BO8Mv13svJZAGtscYzzZAbA0MIsZAMBfWEfu3iivxa0GXk6xYmvu6XaVQWuKRBfmNZAMXcKCkndGhVaZCzQyOoOqjQDNjjZCwiu4ylkddJPW8QVLwgWgpOQ6Hs1ytctWxN9R6PYTa0mEA4GCb2ewnXvmuCBosurS5Af8g0ZBClHgBOnOk4HYzyrPiNYV1dZBZCxm3FKiMvJFKsJvsZCC4F7O7wqbigg7o7ofbVz",
+      "eu_total_reach": 37519,
+      "id": "1798603384006529"
+    }
+  ],
+  "filtered": {
+    "pages": [],
+    "ads": [
+      "2260501227676055"
+    ]
+  }
+}

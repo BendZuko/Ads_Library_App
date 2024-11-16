@@ -1,0 +1,49 @@
+.top-bar {
+    background: white;
+    padding: 20px;
+    border-radius: calc(var(--border-radius) * 1.33);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(8px);
+    border: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.view-toggle {
+    display: flex;
+    gap: 8px;
+}
+
+.view-toggle button {
+    padding: 12px 20px;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    background: var(--background-gray);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.view-toggle button.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.results-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.results-buttons {
+    display: flex;
+    gap: 8px;
+}

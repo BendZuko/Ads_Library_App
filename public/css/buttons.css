@@ -1,0 +1,190 @@
+.fetch-button {
+    background: linear-gradient(135deg, var(--primary-color), #6366f1);
+    color: white;
+    padding: 16px 28px;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: var(--shadow-md);
+}
+
+.fetch-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.action-btn {
+    padding: 8px 16px;
+    border-radius: calc(var(--border-radius) / 2);
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    min-width: auto;
+    transition: all 0.2s ease;
+}
+
+.video-btn { background: var(--primary-color); color: white; }
+.view-btn { background: var(--success-color); color: white; }
+.filter-btn { background: var(--warning-color); color: white; }
+.filter-page-btn { background: var(--secondary-color); color: white; }
+
+.action-btn:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+}
+
+.load-all-videos-btn {
+    background: var(--primary-color);
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.load-all-videos-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.load-all-videos-btn:disabled {
+    background: var(--secondary-color);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.load-all-videos-btn.loading {
+    background: var(--error-color);
+}
+
+.load-all-videos-btn.loading:hover {
+    background: #dc2626;
+}
+
+.update-token-btn,
+.save-search-btn,
+.download-csv-btn,
+.view-saved-btn,
+.filtered-view-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    background: var(--background-gray);
+    color: var(--text-primary);
+}
+
+.remove-row-btn {
+    background: #f97316;
+    color: white;
+    padding: 6px 12px;
+    border-radius: calc(var(--border-radius) / 2);
+    border: none;
+    cursor: pointer;
+    margin-right: 8px;
+}
+
+.remove-page-btn {
+    background: #dc2626;
+    color: white;
+    padding: 6px 12px;
+    border-radius: calc(var(--border-radius) / 2);
+    border: none;
+    cursor: pointer;
+}
+
+.delete-btn {
+    background: var(--error-color);
+    color: white;
+    padding: 6px;
+    border: none;
+    border-radius: calc(var(--border-radius) / 2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+.close-btn,
+.close-modal,
+.close-panel {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+.load-search-btn {
+    background: linear-gradient(135deg, var(--primary-color), #6366f1);
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: var(--shadow-md);
+}
+
+.load-search-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.search-item .action-btn {
+    background: linear-gradient(135deg, var(--primary-color), #6366f1);
+    color: white;
+    padding: 16px 28px;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: var(--shadow-md);
+}
+
+.search-item .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}

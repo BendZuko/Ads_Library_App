@@ -1,0 +1,47 @@
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 24px;
+    gap: 24px;
+}
+
+.main-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0;
+}
+
+.main-logo img {
+    height: 60px;  /* Adjust this value to make the logo bigger/smaller */
+    width: auto;
+    object-fit: contain;
+}
+
+.main-content {
+    margin-left: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.current-search-name {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+.current-search-name h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.view-section {
+    padding: 20px;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    margin: 20px;
+    overflow-x: auto;
+}

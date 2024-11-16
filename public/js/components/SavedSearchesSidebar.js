@@ -71,9 +71,12 @@ export function toggleSavedSearches() {
 
 export async function loadSavedSearch(searchId) {
     try {
+        // Close the sidebar first for better UX
+        toggleSavedSearches();
+
         const response = await fetch(`/api/saved-searches/${searchId}`);
         const searchData = await response.json();
-
+        
         if (!validateSearchData(searchData)) {
             throw new Error('Invalid search data');
         }

@@ -1,0 +1,59 @@
+.search-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-group label i {
+    color: var(--primary-color);
+}
+
+.input-group {
+    position: relative;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: var(--border-radius);
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background: white;
+    box-shadow: var(--shadow-sm);
+}
+
+input:hover, select:hover {
+    border-color: #cbd5e1;
+    box-shadow: var(--shadow-md);
+}
+
+input:focus, select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    outline: none;
+}
+
+.token-update {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+}
+
+.token-update input {
+    min-width: 200px;
+}

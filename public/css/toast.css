@@ -1,0 +1,46 @@
+.toast {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    padding: 12px 16px;
+    border-radius: calc(var(--border-radius) / 2);
+    background: white;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    z-index: 2000;
+    min-width: 200px;
+    max-width: 300px;
+    border-left: 4px solid;
+    transition: opacity 0.3s ease;
+}
+
+.toast.success {
+    border-left-color: var(--success-color);
+}
+
+.toast.error {
+    border-left-color: var(--error-color);
+}
+
+.toast.warning {
+    border-left-color: var(--warning-color);
+}
+
+.toast i {
+    font-size: 16px;
+}
+
+.toast.success i {
+    color: var(--success-color);
+}
+
+.toast.error i {
+    color: var(--error-color);
+}
+
+.toast.warning i {
+    color: var(--warning-color);
+}
