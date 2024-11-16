@@ -1,3 +1,4 @@
+// Required packages for the server
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -8,17 +9,19 @@ const crypto = require('crypto');
 
 const app = express();
 
-// Middleware
+// Configure server middleware
 app.use(cors());
 app.use(express.json());
+// Serve static files from public and static directories
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/static', express.static(path.join(__dirname, '../static')));
 
-// Ensure directories exist
+// Define important directory paths
 const UPLOAD_FOLDER = path.join(__dirname, '../static/videos');
 const DATA_FOLDER = path.join(__dirname, '../data');
 const SAVED_SEARCHES_DIR = path.join(DATA_FOLDER, 'saved_searches');
 
+// Create directories if they don't exist
 [UPLOAD_FOLDER, DATA_FOLDER, SAVED_SEARCHES_DIR].forEach(dir => {
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
@@ -31,9 +34,10 @@ app.use((req, res, next) => {
     next();
 });
 
-// Fetch ads from Facebook API
+// Route to fetch ads from Facebook's Ad Library API
 app.post('/api/fetch-ads', async (req, res) => {
     try {
+        // Extract query parameters
         const {
             access_token,
             search_terms,
@@ -47,16 +51,17 @@ app.post('/api/fetch-ads', async (req, res) => {
             return res.status(400).json({ error: { message: 'Access token is required' }});
         }
 
+        // Create URL parameters
         const params = new URLSearchParams({
             access_token,
-            search_terms: search_terms || 'all',
-            ad_active_status: ad_active_status || 'ALL',
-            ad_delivery_date_min: ad_delivery_date_min || '',
-            ad_reached_countries: ad_reached_countries || 'FR',
-            fields: fields || 'ad_creation_time,ad_creative_bodies,page_name,page_id,ad_snapshot_url,eu_total_reach',
-            limit: '100'
+            search_terms,
+            ad_active_status,
+            ad_delivery_date_min,
+            ad_reached_countries,
+            fields
         });
 
+        // Logging (with hidden token for security)
         console.log('Making request to Facebook API with params:', {
             ...Object.fromEntries(params),
             access_token: '***hidden***'
@@ -81,7 +86,7 @@ app.post('/api/fetch-ads', async (req, res) => {
     }
 });
 
-// Video handling endpoints
+// Route to fetch video URL using Puppeteer
 app.post('/api/fetch-video', async (req, res) => {
     const { url } = req.body;
 
@@ -118,6 +123,7 @@ app.post('/api/fetch-video', async (req, res) => {
     }
 });
 
+// Route to download and save video
 app.post('/api/download-video', async (req, res) => {
     try {
         const { video_url } = req.body;
@@ -161,7 +167,7 @@ app.post('/api/download-video', async (req, res) => {
     }
 });
 
-// Search management endpoints
+// Save search parameters and results
 app.post('/api/save-search', (req, res) => {
     try {
         const searchData = req.body;
@@ -232,12 +238,13 @@ app.delete('/api/saved-searches/:id', (req, res) => {
     }
 });
 
-// Error handling
+// Global error handler
 app.use((err, req, res, next) => {
     console.error('Unhandled error:', err);
     res.status(500).json({ error: 'Internal server error' });
 });
 
+// Start server
 const PORT = process.env.PORT || 5004;
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
