@@ -76,7 +76,6 @@ export async function handleFormSubmit(e) {
 
     try {
         const formData = {
-            access_token: document.getElementById('access_token').value,
             search_terms: document.getElementById('search_terms').value || 'all',
             ad_active_status: document.getElementById('ad_active_status').value,
             ad_delivery_date_min: document.getElementById('ad_delivery_date_min').value,
@@ -84,11 +83,6 @@ export async function handleFormSubmit(e) {
             ad_language: document.getElementById('ad_language').value,
             fields: document.getElementById('fields').value
         };
-
-        // Save parameters to localStorage
-        Object.entries(formData).forEach(([key, value]) => {
-            localStorage.setItem(`fb_${key}`, value);
-        });
 
         const response = await fetch('/api/fetch-ads', {
             method: 'POST',
@@ -134,32 +128,52 @@ export async function updateAccessTokens() {
         return;
     }
 
-    document.getElementById('access_token').value = newToken;
-
-    if (state.adsTable) {
-        const rows = state.adsTable.rows().data();
-        rows.each(function(rowData, index) {
-            if (rowData.ad_snapshot_url) {
-                const url = new URL(rowData.ad_snapshot_url);
-                url.searchParams.set('access_token', newToken);
-                rowData.ad_snapshot_url = url.toString();
-                state.adsTable.row(index).data(rowData);
-            }
+    try {
+        const response = await fetch('/api/update-server-token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ newToken })
         });
-        
-        state.adsTable.draw();
-    }
 
-    state.currentAdsData = state.currentAdsData.map(ad => {
-        if (ad.ad_snapshot_url) {
-            const url = new URL(ad.ad_snapshot_url);
-            url.searchParams.set('access_token', newToken);
-            return { ...ad, ad_snapshot_url: url.toString() };
+        if (!response.ok) {
+            throw new Error('Failed to update server token');
         }
-        return ad;
-    });
 
-    showSuccessToast('Access token updated successfully');
+        const tokenInput = document.getElementById('access_token');
+        if (tokenInput) {
+            tokenInput.value = newToken;
+        }
+
+        if (state.adsTable) {
+            const rows = state.adsTable.rows().data();
+            rows.each(function(rowData, index) {
+                if (rowData.ad_snapshot_url) {
+                    const url = new URL(rowData.ad_snapshot_url);
+                    url.searchParams.set('access_token', newToken);
+                    rowData.ad_snapshot_url = url.toString();
+                    state.adsTable.row(index).data(rowData);
+                }
+            });
+            
+            state.adsTable.draw();
+        }
+
+        state.currentAdsData = state.currentAdsData.map(ad => {
+            if (ad.ad_snapshot_url) {
+                const url = new URL(ad.ad_snapshot_url);
+                url.searchParams.set('access_token', newToken);
+                return { ...ad, ad_snapshot_url: url.toString() };
+            }
+            return ad;
+        });
+
+        showSuccessToast('Access token updated successfully');
+    } catch (error) {
+        showErrorToast(error.message);
+        console.error('Error updating token:', error);
+    }
 }
 
 function showLoading() {
