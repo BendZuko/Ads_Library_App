@@ -405,6 +405,11 @@ app.post('/api/perma-filter/remove', (req, res) => {
     }
 });
 
+// Add this new endpoint
+app.get('/api/current-token', (req, res) => {
+    res.json({ token: currentAccessToken });
+});
+
 // Add a catch-all route for SPA
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));

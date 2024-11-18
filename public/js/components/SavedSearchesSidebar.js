@@ -84,6 +84,13 @@ async function loadSavedSearch(searchId) {
     try {
         toggleSavedSearches();
 
+        // Get current token from server
+        const tokenResponse = await fetch('/api/current-token');
+        if (!tokenResponse.ok) {
+            throw new Error('Failed to fetch current token');
+        }
+        const { token: currentToken } = await tokenResponse.json();
+
         const response = await fetch(`/api/saved-searches/${searchId}`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -95,6 +102,18 @@ async function loadSavedSearch(searchId) {
         if (!validateSearchData(searchData)) {
             console.error('Invalid search data structure:', searchData);
             throw new Error('Invalid search data structure');
+        }
+
+        // Update URLs with current token in search results
+        if (Array.isArray(searchData.results)) {
+            searchData.results = searchData.results.map(ad => {
+                if (ad.ad_snapshot_url) {
+                    const url = new URL(ad.ad_snapshot_url);
+                    url.searchParams.set('access_token', currentToken);
+                    return { ...ad, ad_snapshot_url: url.toString() };
+                }
+                return ad;
+            });
         }
 
         const formFields = {
@@ -158,7 +177,7 @@ async function loadSavedSearch(searchId) {
             updateFilteredView();
             updateResults(searchData.results);
             
-            showSuccessToast('Search loaded successfully');
+            showSuccessToast('Search loaded successfully with updated token');
         } else {
             throw new Error('Results data is not an array');
         }
