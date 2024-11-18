@@ -5,6 +5,7 @@ import { updateTableStats } from '../components/FilteredModal.js';
 let isLoadingVideos = false;
 let loadingInterval = null;
 let currentLoadingPromise = null;
+let savedSearchesCache = null;
 
 export function initializeDataTable() {
     console.log('Initializing DataTable');
@@ -38,12 +39,16 @@ export function initializeDataTable() {
                     className: 'dt-center all'
                 },
                 { 
-                    data: 'eu_total_reach',
+                    data: null,
                     title: 'EU Total Reach',
-                    width: '120px',
-                    className: 'dt-body-right dt-head-center all',
-                    render: function(data) {
-                        return data ? data.toLocaleString() : '0';
+                    width: '200px',
+                    className: 'dt-center all',
+                    render: function(data, type, row) {
+                        if (type === 'display') {
+                            const cellId = `reach-${row.id}`;
+                            return `<div id="${cellId}"><i class="fas fa-spinner fa-spin"></i> Loading...</div>`;
+                        }
+                        return row.eu_total_reach || 0;
                     }
                 },
                 {
@@ -128,6 +133,58 @@ export function initializeDataTable() {
             }
         });
         
+        // Add this draw event handler
+        table.on('draw', async function() {
+            try {
+                const searches = await fetchSavedSearches();
+                
+                table.rows({ page: 'current' }).every(function() {
+                    const row = this.data();
+                    const cellId = `reach-${row.id}`;
+                    const cell = document.getElementById(cellId);
+                    
+                    if (cell) {
+                        // Get all historical reach data including current
+                        const allReachData = [
+                            {
+                                date: new Date(row.search_timestamp),
+                                reach: row.eu_total_reach
+                            },
+                            ...searches
+                                .filter(search => search.results.some(ad => ad.id === row.id))
+                                .map(search => ({
+                                    date: new Date(search.timestamp),
+                                    reach: search.results.find(ad => ad.id === row.id).eu_total_reach
+                                }))
+                        ];
+
+                        // Sort by date, most recent first
+                        allReachData.sort((a, b) => b.date - a.date);
+
+                        // Remove duplicates based on date
+                        const uniqueReachData = allReachData.filter((data, index, self) =>
+                            index === self.findIndex(d => 
+                                d.date.toLocaleDateString() === data.date.toLocaleDateString()
+                            )
+                        );
+
+                        const content = `
+                            <div class="stats-container">
+                                ${uniqueReachData.map(data => 
+                                    `<div class="stat-entry">
+                                        ${data.date.toLocaleDateString()}: ${data.reach.toLocaleString()}
+                                    </div>`
+                                ).join('')}
+                            </div>`;
+                        
+                        cell.innerHTML = content;
+                    }
+                });
+            } catch (error) {
+                console.error('Error updating reach history:', error);
+            }
+        });
+
         state.adsTable = table;
         
         $(window).on('resize', function() {
@@ -469,4 +526,30 @@ async function displayResults(results) {
         console.error('Error applying permanent filter:', error);
         showToast('Error applying permanent filter', 'error');
     }
+}
+
+async function fetchSavedSearches() {
+    if (savedSearchesCache) return savedSearchesCache;
+    
+    try {
+        const response = await fetch('/api/saved-searches');
+        savedSearchesCache = await response.json();
+        return savedSearchesCache;
+    } catch (error) {
+        console.error('Error fetching saved searches:', error);
+        return [];
+    }
+}
+
+export function clearSavedSearchesCache() {
+    savedSearchesCache = null;
+}
+
+async function saveCurrentSearch() {
+    // ... existing save logic ...
+    
+    // After successful save:
+    clearSavedSearchesCache();
+    
+    // ... rest of the function ...
 }
