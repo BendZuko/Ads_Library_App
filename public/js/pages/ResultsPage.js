@@ -1,12 +1,15 @@
 import { state } from '../app.js';
 import { showErrorToast, showSuccessToast, showWarningToast, showToast } from '../components/Toast.js';
 import { updateTableStats } from '../components/FilteredModal.js';
+import { StatsChart } from '../components/StatsModal.js';
 
 let isLoadingVideos = false;
 let loadingInterval = null;
 let currentLoadingPromise = null;
 let savedSearchesCache = null;
 let currentVideoRequest = null;
+
+const statsChart = new StatsChart();
 
 export function initializeDataTable() {
     console.log('Initializing DataTable');
@@ -95,22 +98,38 @@ export function initializeDataTable() {
                     title: 'Stats',
                     width: '150px',
                     className: 'dt-center all',
-                    orderable: true,
                     render: function(data, type, row) {
+                        const cellId = `stats-${row.id}`;
+                        
                         if (type === 'sort') {
-                            // Extract the percentage value for sorting
-                            const statsCell = document.getElementById(`stats-${row.id}`);
+                            // Extract percentage for sorting
+                            const statsCell = document.getElementById(cellId);
                             if (statsCell) {
-                                const percentText = statsCell.textContent.match(/-?\d+\.?\d*/);
+                                const percentText = statsCell.querySelector('.stats-change')?.textContent.match(/-?\d+\.?\d*/);
                                 return percentText ? parseFloat(percentText[0]) : 0;
                             }
                             return 0;
                         }
+                        
                         if (type === 'display') {
-                            const cellId = `stats-${row.id}`;
-                            return `<div id="${cellId}"><i class="fas fa-spinner fa-spin"></i> Calculating...</div>`;
+                            // Calculate 7-day change here
+                            const reachChange = calculateReachChange(row.id);
+                            const changeClass = reachChange > 0 ? 'increase' : reachChange < 0 ? 'decrease' : '';
+                            const changeIcon = reachChange > 0 ? 'fa-arrow-up' : reachChange < 0 ? 'fa-arrow-down' : '';
+                            
+                            return `
+                                <div id="${cellId}" class="stats-cell" style="cursor: pointer;">
+                                    <div class="stats-change ${changeClass}">
+                                        ${changeIcon ? `<i class="fas ${changeIcon}"></i>` : ''}
+                                        ${Math.abs(reachChange)}%
+                                    </div>
+                                    <div class="stats-period">7d change</div>
+                                    <div class="view-stats">
+                                        <i class="fas fa-chart-line"></i> View Stats
+                                    </div>
+                                </div>`;
                         }
-                        return 0;
+                        return '';
                     }
                 }
             ],
@@ -678,4 +697,16 @@ function updateStatsCell(rowId, statsData) {
     
     // Update the row data in the DataTable
     table.row(`#stats-${rowId}`).data(row);
+}
+
+$('#resultsTable').on('click', '.stats-cell', function() {
+    const rowData = state.adsTable.row($(this).closest('tr')).data();
+    statsChart.showStats(rowData.id);
+});
+
+// Helper function to calculate reach change
+function calculateReachChange(adId) {
+    // Your existing logic to calculate 7-day change
+    // Return the percentage change
+    // This should match your current implementation
 }
