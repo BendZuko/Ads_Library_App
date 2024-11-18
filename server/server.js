@@ -47,79 +47,6 @@ const SAVED_SEARCHES_DIR = path.join(DATA_FOLDER, 'saved_searches');
 // Add this near the top after imports
 let currentAccessToken = process.env.FB_ACCESS_TOKEN;
 
-// Add these new routes before the existing routes
-app.get('/api/token-info', async (req, res) => {
-    try {
-        const response = await axios.get(`https://graph.facebook.com/debug_token`, {
-            params: {
-                input_token: currentAccessToken,
-                access_token: `${process.env.App_ID}|${process.env.App_secret}`
-            }
-        });
-
-        const { data } = response.data;
-        const expiresAt = new Date(data.expires_at * 1000);
-        const daysUntilExpiration = Math.ceil((expiresAt - new Date()) / (1000 * 60 * 60 * 24));
-
-        res.json({
-            daysUntilExpiration,
-            expiresAt: expiresAt.toISOString()
-        });
-    } catch (error) {
-        console.error('Error checking token:', error);
-        res.status(500).json({ error: 'Failed to check token expiration' });
-    }
-});
-
-app.post('/api/refresh-token', async (req, res) => {
-    try {
-        // Exchange the current token for a long-lived token
-        const response = await axios.get('https://graph.facebook.com/v18.0/oauth/access_token', {
-            params: {
-                grant_type: 'fb_exchange_token',
-                client_id: process.env.App_ID,
-                client_secret: process.env.App_secret,
-                fb_exchange_token: currentAccessToken
-            }
-        });
-
-        const newToken = response.data.access_token;
-        
-        // Update the .env file
-        const envPath = path.join(__dirname, '.env');
-        const envContent = await fs.promises.readFile(envPath, 'utf8');
-        const updatedContent = envContent.replace(
-            /FB_ACCESS_TOKEN=.*/,
-            `FB_ACCESS_TOKEN=${newToken}`
-        );
-        await fs.promises.writeFile(envPath, updatedContent);
-
-        // Update the current token in memory
-        currentAccessToken = newToken;
-
-        // Get new expiration info
-        const tokenInfo = await axios.get(`https://graph.facebook.com/debug_token`, {
-            params: {
-                input_token: newToken,
-                access_token: `${process.env.App_ID}|${process.env.App_secret}`
-            }
-        });
-
-        const { data } = tokenInfo.data;
-        const expiresAt = new Date(data.expires_at * 1000);
-        const daysUntilExpiration = Math.ceil((expiresAt - new Date()) / (1000 * 60 * 60 * 24));
-
-        res.json({
-            success: true,
-            daysUntilExpiration,
-            expiresAt: expiresAt.toISOString()
-        });
-    } catch (error) {
-        console.error('Error refreshing token:', error);
-        res.status(500).json({ error: 'Failed to refresh token' });
-    }
-});
-
 // Route to fetch ads from Facebook's Ad Library API
 app.post('/api/fetch-ads', async (req, res) => {
     try {
@@ -434,6 +361,54 @@ app.post('/api/update-server-token', (req, res) => {
 
 // Start server
 const PORT = process.env.PORT || 5004;
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+
+async function refreshLongLivedToken() {
+    try {
+        const currentToken = process.env.FB_ACCESS_TOKEN;
+        
+        const response = await axios.get('https://graph.facebook.com/v18.0/oauth/access_token', {
+            params: {
+                grant_type: 'fb_exchange_token',
+                client_id: process.env.App_ID,
+                client_secret: process.env.App_secret,
+                fb_exchange_token: currentToken
+            }
+        });
+
+        const newToken = response.data.access_token;
+        
+        // Update the .env file
+        const envPath = path.join(__dirname, '.env');
+        const envContent = await fs.promises.readFile(envPath, 'utf8');
+        const updatedContent = envContent.replace(
+            /FB_ACCESS_TOKEN=.*/,
+            `FB_ACCESS_TOKEN=${newToken}`
+        );
+        await fs.promises.writeFile(envPath, updatedContent);
+
+        // Update the current environment variable
+        process.env.FB_ACCESS_TOKEN = newToken;
+        
+        console.log('Facebook token refreshed successfully');
+    } catch (error) {
+        console.error('Error refreshing Facebook token:', error);
+    }
+}
+
+// Modify your server startup
+const startServer = async () => {
+    try {
+        // Always refresh token on startup
+        await refreshLongLivedToken();
+        
+        // Your existing server startup code
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error('Server startup error:', error);
+    }
+};
+
+// Call startServer instead of app.listen
+startServer();
