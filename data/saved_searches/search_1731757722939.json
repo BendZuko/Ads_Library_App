@@ -1,0 +1,302 @@
+{
+  "name": "60",
+  "timestamp": "2024-11-16T11:48:42.937Z",
+  "parameters": {
+    "access_token": "EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+    "search_terms": "Confort Intemporels!",
+    "ad_active_status": "ACTIVE",
+    "ad_delivery_date_min": "2024-11-14",
+    "ad_reached_countries": "FR",
+    "fields": "ad_creation_time,page_name,ad_snapshot_url,eu_total_reach"
+  },
+  "results": [
+    {
+      "ad_creation_time": "2024-11-15",
+      "page_name": "Élévans",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=538765102295822&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 238,
+      "id": "538765102295822"
+    },
+    {
+      "ad_creation_time": "2024-11-15",
+      "page_name": "Élévans",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=871721741617728&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 89,
+      "id": "871721741617728"
+    },
+    {
+      "ad_creation_time": "2024-11-14",
+      "page_name": "Lyonnais Boutique",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1245952930199290&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 582,
+      "id": "1245952930199290"
+    },
+    {
+      "ad_creation_time": "2024-11-14",
+      "page_name": "Lyonnais Boutique",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1288317192598088&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 3446,
+      "id": "1288317192598088"
+    },
+    {
+      "ad_creation_time": "2024-11-14",
+      "page_name": "Lyonnais Boutique",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=2948975321935661&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 122,
+      "id": "2948975321935661"
+    },
+    {
+      "ad_creation_time": "2024-11-14",
+      "page_name": "Élévans",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1829837757549450&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 119,
+      "id": "1829837757549450"
+    },
+    {
+      "ad_creation_time": "2024-11-14",
+      "page_name": "B.H Menswear",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1303546207667153&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 970,
+      "id": "1303546207667153"
+    },
+    {
+      "ad_creation_time": "2024-11-14",
+      "page_name": "Muësa",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=533446889537174&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 9,
+      "id": "533446889537174"
+    },
+    {
+      "ad_creation_time": "2024-11-14",
+      "page_name": "Muësa",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=541581305310264&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 48,
+      "id": "541581305310264"
+    },
+    {
+      "ad_creation_time": "2024-11-13",
+      "page_name": "Charles Tyrwhitt",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=3875431932777903&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 1875,
+      "id": "3875431932777903"
+    },
+    {
+      "ad_creation_time": "2024-11-12",
+      "page_name": "Charles Tyrwhitt",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=2675259589331195&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 6753,
+      "id": "2675259589331195"
+    },
+    {
+      "ad_creation_time": "2024-11-11",
+      "page_name": "Élévans",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=572158528529328&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 2519,
+      "id": "572158528529328"
+    },
+    {
+      "ad_creation_time": "2024-11-11",
+      "page_name": "Élévans",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1775318826609394&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 607,
+      "id": "1775318826609394"
+    },
+    {
+      "ad_creation_time": "2024-11-11",
+      "page_name": "Élévans",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=2813078072203001&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 1153,
+      "id": "2813078072203001"
+    },
+    {
+      "ad_creation_time": "2024-11-09",
+      "page_name": "Élévans",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1631488517717863&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 3177,
+      "id": "1631488517717863"
+    },
+    {
+      "ad_creation_time": "2024-11-09",
+      "page_name": "Élévans",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1971225976684135&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 23018,
+      "id": "1971225976684135"
+    },
+    {
+      "ad_creation_time": "2024-11-07",
+      "page_name": "Molli",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=569732068866418&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 1349,
+      "id": "569732068866418"
+    },
+    {
+      "ad_creation_time": "2024-11-06",
+      "page_name": "Muësa",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1252824289302811&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 1076,
+      "id": "1252824289302811"
+    },
+    {
+      "ad_creation_time": "2024-11-06",
+      "page_name": "Muësa",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=424780293809549&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 2330,
+      "id": "424780293809549"
+    },
+    {
+      "ad_creation_time": "2024-11-05",
+      "page_name": "Salsa Jeans",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=3878283052501260&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 3556,
+      "id": "3878283052501260"
+    },
+    {
+      "ad_creation_time": "2024-11-04",
+      "page_name": "1971",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1234171411125053&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 1891,
+      "id": "1234171411125053"
+    },
+    {
+      "ad_creation_time": "2024-11-01",
+      "page_name": "Douci",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=3985837005071772&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 1529,
+      "id": "3985837005071772"
+    },
+    {
+      "ad_creation_time": "2024-11-01",
+      "page_name": "Douci",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=3760242704291160&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 5200,
+      "id": "3760242704291160"
+    },
+    {
+      "ad_creation_time": "2024-10-25",
+      "page_name": "Molli",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=3912407582416360&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 11413,
+      "id": "3912407582416360"
+    },
+    {
+      "ad_creation_time": "2024-10-25",
+      "page_name": "MARTINELLI",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1345118223123586&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 19375,
+      "id": "1345118223123586"
+    },
+    {
+      "ad_creation_time": "2024-10-10",
+      "page_name": "FunnyFuzzy_fr",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=573247875433536&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 19442,
+      "id": "573247875433536"
+    },
+    {
+      "ad_creation_time": "2024-09-30",
+      "page_name": "Coton vert",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=509422822048398&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 23158,
+      "id": "509422822048398"
+    },
+    {
+      "ad_creation_time": "2024-09-20",
+      "page_name": "HBT Collection",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1325705868395588&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 8329,
+      "id": "1325705868395588"
+    },
+    {
+      "ad_creation_time": "2024-09-17",
+      "page_name": "Mylittlebed",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1465405070815131&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 83310,
+      "id": "1465405070815131"
+    },
+    {
+      "ad_creation_time": "2024-07-25",
+      "page_name": "HBT Collection",
+      "ad_snapshot_url": "https://www.facebook.com/ads/archive/render_ad/?id=1855639478262245&access_token=EAA0PtZAaDyj8BO1WsSBqZBhzDKr4GYauLobDY0jFwoUJ871vdPIswsdUsANQvXWh5kZC50PmQRfgiGF8Ka40DfMHcy47L2mQZBg9gk05n54Y2JXrf19DH9mxGjTCOaQut8Jkb4uErbO4ZAimwRLve0hyO8mA5oMewIPZAZAlG0FDPK2PTFCFJpv4qvPpHBJHZAUy0hpxGBphZCv7dOVIRbpXtJiZCR6TvEltZBG6T25Ops3g7wZD",
+      "eu_total_reach": 31732,
+      "id": "1855639478262245"
+    }
+  ],
+  "filtered": {
+    "pages": [],
+    "ads": [
+      "1113057947055544",
+      "876978384522379",
+      "481944500878512",
+      "582431977768837",
+      "882226370716996",
+      "883873870559463",
+      "2932789483551553",
+      "538755199116370",
+      "540621848718049",
+      "1334153940899970",
+      "1555770858381648",
+      "3367183503411726",
+      "3889795031232283",
+      "541452305260861",
+      "578001151577177",
+      "611862577834436",
+      "897085098757644",
+      "1021314723016575",
+      "1071607504205796",
+      "1083319783286750",
+      "1090116386028690",
+      "1097162111260105",
+      "8661236903969304",
+      "1210538916905732",
+      "415202394970369",
+      "537881915731630",
+      "544821944809785",
+      "935433165120320",
+      "1007659194459197",
+      "1309056083453045",
+      "1729533407845704",
+      "8896364410415509",
+      "9006910269348546",
+      "578422664647780",
+      "883456563987421",
+      "1010773924139897",
+      "1037080984838013",
+      "1091986788994881",
+      "1106127361231951",
+      "1127794728697280",
+      "1241102173883605",
+      "1517384092280614",
+      "2515131778679916",
+      "452256710831379",
+      "501000712898957",
+      "539753502165840",
+      "548175397914892",
+      "581113437671528",
+      "875779941306394",
+      "943016317863500",
+      "974765651363738",
+      "1101797281390393",
+      "1221213005767106",
+      "1752836035451542",
+      "1994908804303780",
+      "566925419400615",
+      "927566042582857",
+      "940506337932556",
+      "1955238191642349",
+      "2260501227676055",
+      "3420722478234359",
+      "3930640330528386",
+      "1066271271889478",
+      "1588170258495841",
+      "948520447098911",
+      "1230218221358859",
+      "1283069769513559",
+      "738700208433486",
+      "973516877829578",
+      "1318826702811238",
+      "530762809557613",
+      "4325277971032309",
+      "1798603384006529"
+    ]
+  }
+}
