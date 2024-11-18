@@ -155,7 +155,7 @@ export function initializeDataTable() {
                         const allReachData = [
                             // Current data
                             {
-                                date: new Date(row.search_timestamp || Date.now()),
+                                fetchTime: new Date(row.search_timestamp || Date.now()),
                                 reach: row.eu_total_reach || 0,
                                 isCurrent: true
                             },
@@ -167,28 +167,21 @@ export function initializeDataTable() {
                                     search.results.some(ad => ad.id === row.id)
                                 )
                                 .map(search => ({
-                                    date: new Date(search.fetchTimestamp || search.timestamp || search.saveTimestamp),
+                                    fetchTime: new Date(search.fetchTimestamp || search.timestamp),
                                     reach: search.results.find(ad => ad.id === row.id)?.eu_total_reach || 0,
                                     isCurrent: false
                                 }))
                         ];
 
-                        // Sort by date, most recent first
-                        allReachData.sort((a, b) => b.date - a.date);
-
-                        // Remove duplicates based on date
-                        const uniqueReachData = allReachData.filter((data, index, self) =>
-                            index === self.findIndex(d => 
-                                d.date.toLocaleDateString() === data.date.toLocaleDateString()
-                            )
-                        );
+                        // Sort by fetch time, most recent first
+                        allReachData.sort((a, b) => b.fetchTime - a.fetchTime);
 
                         // Format the content with styling
                         const content = `
                             <div class="stats-container">
-                                ${uniqueReachData.map(data => `
+                                ${allReachData.map(data => `
                                     <div class="stat-entry${data.isCurrent ? ' current' : ''}">
-                                        ${data.date.toLocaleDateString()}: ${data.reach.toLocaleString()}
+                                        ${data.fetchTime.toLocaleString()}: ${data.reach.toLocaleString()}
                                         ${data.isCurrent ? ' (Current)' : ''}
                                     </div>
                                 `).join('')}
