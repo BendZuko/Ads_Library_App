@@ -267,20 +267,37 @@ app.post('/api/download-video', async (req, res) => {
 });
 
 // Save search parameters and results
-app.post('/api/save-search', (req, res) => {
+app.post('/api/save-search', async (req, res) => {
     try {
         const searchData = req.body;
-        const filename = `search_${Date.now()}.json`;
-        const filepath = path.join(SAVED_SEARCHES_DIR, filename);
+        if (!searchData || !searchData.name) {
+            return res.status(400).json({ message: 'Invalid search data' });
+        }
 
-        fs.writeFileSync(filepath, JSON.stringify(searchData, null, 2));
-        res.json({ success: true, id: filename });
+        const filename = `search_${Date.now()}.json`;
+        const filePath = path.join(SAVED_SEARCHES_DIR, filename);
+
+        // Ensure directory exists
+        if (!fs.existsSync(SAVED_SEARCHES_DIR)) {
+            fs.mkdirSync(SAVED_SEARCHES_DIR, { recursive: true });
+        }
+
+        // Save the file
+        await fs.promises.writeFile(
+            filePath,
+            JSON.stringify(searchData, null, 2),
+            'utf8'
+        );
+
+        res.json({ 
+            message: 'Search saved successfully',
+            id: filename.replace('.json', '')
+        });
     } catch (error) {
         console.error('Error saving search:', error);
-        res.status(500).json({ error: 'Failed to save search' });
+        res.status(500).json({ message: 'Failed to save search' });
     }
 });
-
 app.get('/api/saved-searches/:id', (req, res) => {
     try {
         const searchId = req.params.id;

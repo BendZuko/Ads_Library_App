@@ -5,11 +5,20 @@ import { updateAccessTokens } from './FormHandler.js';
 import { updateFilteredView } from './FilteredModal.js';
 
 async function saveCurrentSearch() {
+    // First check if we have current data to save
+    if (!state.currentAdsData || !Array.isArray(state.currentAdsData)) {
+        showErrorToast('No search data to save');
+        return;
+    }
+
     const searchName = prompt('Enter a name for this search:');
     if (!searchName) return;
 
     try {
+        // Check for existing search
         const response = await fetch('/api/saved-searches');
+        if (!response.ok) throw new Error('Failed to fetch saved searches');
+        
         const searches = await response.json();
         const existingSearch = searches.find(search => search.name === searchName);
 
@@ -22,23 +31,34 @@ async function saveCurrentSearch() {
 
         // Get permanent filter data
         const permFilterResponse = await fetch('/api/perma-filter');
+        if (!permFilterResponse.ok) throw new Error('Failed to fetch permanent filter data');
         const permFilterData = await permFilterResponse.json();
+
+        // Collect form data only from elements that exist
+        const formElements = {
+            search_terms: document.getElementById('search_terms'),
+            ad_active_status: document.getElementById('ad_active_status'),
+            ad_delivery_date_min: document.getElementById('ad_delivery_date_min'),
+            ad_reached_countries: document.getElementById('ad_reached_countries'),
+            fields: document.getElementById('fields')
+        };
+
+        // Create parameters object with safe checks
+        const parameters = {};
+        for (const [key, element] of Object.entries(formElements)) {
+            if (element) {
+                parameters[key] = element.value;
+            }
+        }
 
         const searchData = {
             name: searchName,
             timestamp: new Date().toISOString(),
-            parameters: {
-                access_token: document.getElementById('access_token').value,
-                search_terms: document.getElementById('search_terms').value,
-                ad_active_status: document.getElementById('ad_active_status').value,
-                ad_delivery_date_min: document.getElementById('ad_delivery_date_min').value,
-                ad_reached_countries: document.getElementById('ad_reached_countries').value,
-                fields: document.getElementById('fields').value
-            },
+            parameters,
             results: state.currentAdsData,
             filtered: {
-                pages: Array.from(state.filteredPages),
-                ads: Array.from(state.filteredAds)
+                pages: Array.from(state.filteredPages || new Set()),
+                ads: Array.from(state.filteredAds || new Set())
             },
             permFiltered: {
                 pages: permFilterData.pages || []
@@ -51,12 +71,29 @@ async function saveCurrentSearch() {
             body: JSON.stringify(searchData)
         });
 
-        if (!saveResponse.ok) throw new Error('Failed to save search');
+        if (!saveResponse.ok) {
+            const errorData = await saveResponse.json();
+            throw new Error(errorData.message || 'Failed to save search');
+        }
+
+        // Update UI elements
+        const searchNameDisplay = document.getElementById('currentSearchName');
+        if (searchNameDisplay) {
+            searchNameDisplay.textContent = searchName;
+        }
+        localStorage.setItem('currentSearchName', searchName);
+
         showSuccessToast('Search saved successfully');
-        await loadSavedSearchesList();
+        
+        // Refresh the saved searches list
+        const searchesList = document.getElementById('searchesList');
+        if (searchesList) {
+            await loadSavedSearchesList();
+        }
+
     } catch (error) {
-        showErrorToast('Failed to save search');
         console.error('Error saving search:', error);
+        showErrorToast(`Failed to save search: ${error.message}`);
     }
 }
 
@@ -244,24 +281,11 @@ async function loadSavedSearchesList() {
                 </div>
             `;
             
-            // Add event listeners using the timestamp
             const loadBtn = searchItem.querySelector('.load-btn');
-            loadBtn.addEventListener('click', () => {
-                const timestamp = loadBtn.dataset.timestamp;
-                if (timestamp) {
-                    console.log('Loading search with timestamp:', timestamp);
-                    loadSavedSearch(timestamp);
-                }
-            });
-            
             const deleteBtn = searchItem.querySelector('.delete-btn');
-            deleteBtn.addEventListener('click', () => {
-                const timestamp = deleteBtn.dataset.timestamp;
-                if (timestamp) {
-                    console.log('Deleting search with timestamp:', timestamp);
-                    deleteSavedSearch(`search_${timestamp}.json`);
-                }
-            });
+            
+            loadBtn.addEventListener('click', () => loadSavedSearch(search.id));
+            deleteBtn.addEventListener('click', () => deleteSavedSearch(search.id));
             
             searchesList.appendChild(searchItem);
         });
