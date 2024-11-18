@@ -82,9 +82,26 @@ export async function loadSavedSearch(searchId) {
             throw new Error('Invalid search data');
         }
 
-        // Update access token if present in the search data
-        if (searchData.parameters && searchData.parameters.access_token) {
-            document.getElementById('access_token').value = searchData.parameters.access_token;
+        // Update form fields if they exist
+        const formFields = {
+            'access_token': searchData.parameters?.access_token,
+            'search_terms': searchData.parameters?.search_terms,
+            'ad_active_status': searchData.parameters?.ad_active_status,
+            'ad_delivery_date_min': searchData.parameters?.ad_delivery_date_min,
+            'ad_reached_countries': searchData.parameters?.ad_reached_countries,
+            'fields': searchData.parameters?.fields
+        };
+
+        // Safely update each form field
+        Object.entries(formFields).forEach(([fieldId, value]) => {
+            const element = document.getElementById(fieldId);
+            if (element && value !== undefined) {
+                element.value = value;
+            }
+        });
+
+        // Only update access tokens if the field exists and has a value
+        if (document.getElementById('access_token')?.value) {
             await updateAccessTokens();
         }
 

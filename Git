@@ -3,3 +3,4 @@ git reset
 git add .
 git commit -m "Update app.js"
 git push
+git reset --hard HEAD
