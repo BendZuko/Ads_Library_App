@@ -181,6 +181,13 @@ async function loadSavedSearch(searchId) {
         } else {
             throw new Error('Results data is not an array');
         }
+
+        // Update the current search name
+        localStorage.setItem('currentSearchName', searchData.name);
+        const searchNameDisplay = document.getElementById('currentSearchName');
+        if (searchNameDisplay) {
+            searchNameDisplay.textContent = searchData.name;
+        }
     } catch (error) {
         console.error('Error loading saved search:', error);
         showErrorToast(`Failed to load search: ${error.message}`);
@@ -293,6 +300,15 @@ function validateSearchData(data) {
         return false;
     }
     return true;
+}
+
+// Add this to clear the name when starting a new search
+export function clearCurrentSearchName() {
+    localStorage.removeItem('currentSearchName');
+    const searchNameDisplay = document.getElementById('currentSearchName');
+    if (searchNameDisplay) {
+        searchNameDisplay.textContent = 'To Save';
+    }
 }
 
 export {

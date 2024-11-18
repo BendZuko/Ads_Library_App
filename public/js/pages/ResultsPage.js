@@ -339,6 +339,13 @@ export async function updateResults(ads) {
         
         console.log('Table updated');
 
+        // Update the current search name display
+        const searchNameDisplay = document.getElementById('currentSearchName');
+        if (searchNameDisplay) {
+            const savedSearchName = localStorage.getItem('currentSearchName');
+            searchNameDisplay.textContent = savedSearchName || 'To Save';
+        }
+
     } catch (error) {
         console.error('Error applying filters:', error);
         showToast('Error applying filters', 'error');

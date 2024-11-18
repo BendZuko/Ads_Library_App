@@ -1,5 +1,3 @@
--Remove token management from html, and just update the token in env on every launch
--Add a permanent filter list
 -In the data-table, add first column of date of data fetched
 -Last row should be statistics, It should calculate or estimate the last 7 days % change based of previous data fetched (check previous searches), if there is no previous search for this AD, leave it blank. And when i click on it, it should show me the chart where the points : first date of ad creation, date of data fetched, and other dates of data fetched and the respective data of EU reach.
 

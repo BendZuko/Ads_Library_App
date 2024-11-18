@@ -32,7 +32,8 @@ import {
     toggleSavedSearches,
     loadSavedSearch,
     saveCurrentSearch,
-    deleteSavedSearch
+    deleteSavedSearch,
+    clearCurrentSearchName
 } from './components/SavedSearchesSidebar.js';
 import {
     openPermFilteredView,
@@ -56,6 +57,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sidebar) {
         sidebar.classList.remove('visible');
     }
+
+    document.getElementById('searchForm').addEventListener('submit', () => {
+        clearCurrentSearchName();
+        handleFormSubmit();
+    });
 });
 
 // Export necessary functions for global usage
@@ -81,5 +87,6 @@ export {
     addToPermaFilter,
     openPermFilteredView,
     closePermFilteredView,
-    unPermFilterPage
+    unPermFilterPage,
+    clearCurrentSearchName
 };
