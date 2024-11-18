@@ -34,15 +34,21 @@ app.use((req, res, next) => {
 
 // Define important directory paths
 const UPLOAD_FOLDER = path.join(__dirname, '../static/videos');
-const DATA_FOLDER = path.join(__dirname, '../data');
-const SAVED_SEARCHES_DIR = path.join(DATA_FOLDER, 'saved_searches');
+const DATA_DIR = path.join(__dirname, '..', 'data');
+const SAVED_SEARCHES_DIR = path.join(DATA_DIR, 'saved_searches');
+const PERMA_FILTER_FILE = path.join(DATA_DIR, 'perma_filter.json');
 
 // Create directories if they don't exist
-[UPLOAD_FOLDER, DATA_FOLDER, SAVED_SEARCHES_DIR].forEach(dir => {
+[UPLOAD_FOLDER, DATA_DIR, SAVED_SEARCHES_DIR].forEach(dir => {
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
     }
 });
+
+// Initialize perma_filter.json if it doesn't exist
+if (!fs.existsSync(PERMA_FILTER_FILE)) {
+    fs.writeFileSync(PERMA_FILTER_FILE, JSON.stringify({ pages: [] }));
+}
 
 // Add this near the top after imports
 let currentAccessToken = process.env.FB_ACCESS_TOKEN;
@@ -275,29 +281,14 @@ app.post('/api/save-search', (req, res) => {
     }
 });
 
-app.get('/api/saved-searches', (req, res) => {
-    try {
-        const files = fs.readdirSync(SAVED_SEARCHES_DIR);
-        const searches = files
-            .filter(file => file.endsWith('.json'))
-            .map(file => {
-                const filepath = path.join(SAVED_SEARCHES_DIR, file);
-                const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
-                return { ...data, id: file };
-            });
-        res.json(searches);
-    } catch (error) {
-        console.error('Error loading searches:', error);
-        res.status(500).json({ error: 'Failed to load searches' });
-    }
-});
-
 app.get('/api/saved-searches/:id', (req, res) => {
     try {
         const searchId = req.params.id;
-        const filepath = path.join(SAVED_SEARCHES_DIR, searchId);
+        // Check if the ID already includes 'search_' prefix and '.json' extension
+        const filename = searchId.includes('search_') ? searchId : `search_${searchId}.json`;
+        const filepath = path.join(SAVED_SEARCHES_DIR, filename);
         
-        console.log('Attempting to load file:', filepath);
+        console.log('Looking for saved search file:', filepath);
         
         if (!fs.existsSync(filepath)) {
             console.log('File not found:', filepath);
@@ -316,6 +307,37 @@ app.get('/api/saved-searches/:id', (req, res) => {
     }
 });
 
+app.get('/api/saved-searches', (req, res) => {
+    try {
+        const files = fs.readdirSync(SAVED_SEARCHES_DIR);
+        const searches = files
+            .filter(file => file.endsWith('.json'))
+            .map(file => {
+                try {
+                    const filepath = path.join(SAVED_SEARCHES_DIR, file);
+                    const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+                    return {
+                        id: file,
+                        name: data.name || 'Unnamed Search',
+                        timestamp: data.timestamp || new Date().toISOString(),
+                        parameters: data.parameters || {},
+                        results: Array.isArray(data.results) ? data.results : [],
+                        filtered: data.filtered || { pages: [], ads: [] }
+                    };
+                } catch (error) {
+                    console.warn(`Error processing file ${file}:`, error);
+                    return null;
+                }
+            })
+            .filter(search => search !== null); // Remove any invalid entries
+        
+        res.json(searches);
+    } catch (error) {
+        console.error('Error loading searches:', error);
+        res.status(500).json({ error: 'Failed to load searches' });
+    }
+});
+
 app.delete('/api/saved-searches/:id', (req, res) => {
     try {
         const filepath = path.join(SAVED_SEARCHES_DIR, req.params.id);
@@ -328,6 +350,58 @@ app.delete('/api/saved-searches/:id', (req, res) => {
     } catch (error) {
         console.error('Error deleting search:', error);
         res.status(500).json({ error: 'Failed to delete search' });
+    }
+});
+
+// Add new endpoints for permanent filter management
+app.post('/api/perma-filter', (req, res) => {
+    try {
+        const { pageName } = req.body;
+        if (!pageName) {
+            return res.status(400).json({ error: 'Page name is required' });
+        }
+
+        const filterData = JSON.parse(fs.readFileSync(PERMA_FILTER_FILE, 'utf8'));
+        
+        // Add page if it's not already in the list
+        if (!filterData.pages.includes(pageName)) {
+            filterData.pages.push(pageName);
+            fs.writeFileSync(PERMA_FILTER_FILE, JSON.stringify(filterData, null, 2));
+        }
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error adding to permanent filter:', error);
+        res.status(500).json({ error: 'Failed to add to permanent filter' });
+    }
+});
+
+app.get('/api/perma-filter', (req, res) => {
+    try {
+        const filterData = JSON.parse(fs.readFileSync(PERMA_FILTER_FILE, 'utf8'));
+        res.json(filterData);
+    } catch (error) {
+        console.error('Error reading permanent filter:', error);
+        res.status(500).json({ error: 'Failed to read permanent filter' });
+    }
+});
+
+// Add this endpoint alongside your other perma-filter endpoints
+app.post('/api/perma-filter/remove', (req, res) => {
+    try {
+        const { pageName } = req.body;
+        if (!pageName) {
+            return res.status(400).json({ error: 'Page name is required' });
+        }
+
+        const filterData = JSON.parse(fs.readFileSync(PERMA_FILTER_FILE, 'utf8'));
+        filterData.pages = filterData.pages.filter(page => page !== pageName);
+        fs.writeFileSync(PERMA_FILTER_FILE, JSON.stringify(filterData, null, 2));
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error removing from permanent filter:', error);
+        res.status(500).json({ error: 'Failed to remove from permanent filter' });
     }
 });
 
