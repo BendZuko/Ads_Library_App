@@ -98,13 +98,19 @@ export function initializeDataTable() {
                     orderable: true,
                     render: function(data, type, row) {
                         if (type === 'sort') {
-                            return row.reachChangePercent || 0;
+                            // Extract the percentage value for sorting
+                            const statsCell = document.getElementById(`stats-${row.id}`);
+                            if (statsCell) {
+                                const percentText = statsCell.textContent.match(/-?\d+\.?\d*/);
+                                return percentText ? parseFloat(percentText[0]) : 0;
+                            }
+                            return 0;
                         }
                         if (type === 'display') {
                             const cellId = `stats-${row.id}`;
                             return `<div id="${cellId}"><i class="fas fa-spinner fa-spin"></i> Calculating...</div>`;
                         }
-                        return row.reachChangePercent || 0;
+                        return 0;
                     }
                 }
             ],
