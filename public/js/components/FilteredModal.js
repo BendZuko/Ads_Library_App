@@ -4,22 +4,35 @@ import { escapeHtml, formatDate } from '../utils/helpers.js';
 // Add this function at the top level of the file
 export function updateTableStats() {
     setTimeout(() => {
-        const filteredAdsCount = state.filteredAds.size;
-        const filteredPagesCount = state.filteredPages.size;
-        const currentVisibleCount = state.adsTable ? state.adsTable.data().length : 0;
-        
-        const statsHtml = `
-            <span>Visible: ${currentVisibleCount.toLocaleString()} ads</span>
-            <span class="stats-divider">|</span>
-            <span>Filtered: ${filteredAdsCount.toLocaleString()} ads</span>
-            <span class="stats-divider">|</span>
-            <span>Filtered Pages: ${filteredPagesCount}</span>
-        `;
+        try {
+            if (!state.adsTable) {
+                console.log('DataTable not yet initialized');
+                return;
+            }
 
-        // Update both top and bottom stats
-        document.querySelector('.total-entries').innerHTML = statsHtml;
-        document.querySelector('.total-entries-bottom').innerHTML = statsHtml;
-    }, 50);
+            const filteredAdsCount = state.filteredAds ? state.filteredAds.size : 0;
+            const filteredPagesCount = state.filteredPages ? state.filteredPages.size : 0;
+            const currentVisibleCount = state.adsTable.data().length;
+
+            const statsHtml = `
+                <span>Visible: ${currentVisibleCount.toLocaleString()} ads</span>
+                <span class="stats-divider">|</span>
+                <span>Filtered: ${filteredAdsCount.toLocaleString()} ads</span>
+                <span class="stats-divider">|</span>
+                <span>Filtered Pages: ${filteredPagesCount}</span>
+            `;
+
+            // Safely update stats elements if they exist
+            const topStats = document.querySelector('.total-entries');
+            const bottomStats = document.querySelector('.total-entries-bottom');
+
+            if (topStats) topStats.innerHTML = statsHtml;
+            if (bottomStats) bottomStats.innerHTML = statsHtml;
+
+        } catch (error) {
+            console.error('Error updating table stats:', error);
+        }
+    }, 100); // Increased timeout to ensure table is ready
 }
 
 // Filtering Functions

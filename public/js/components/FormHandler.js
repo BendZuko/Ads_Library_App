@@ -70,11 +70,32 @@ export function loadSavedParameters() {
     });
 }
 
-export async function handleFormSubmit(e) {
-    e.preventDefault();
+export function storeFetchTimestamp() {
+    const fetchTimestamp = new Date().toISOString();
+    localStorage.setItem('currentFetchTimestamp', fetchTimestamp);
+    
+    // Update both the search name and timestamp displays
+    const searchNameDisplay = document.getElementById('currentSearchName');
+    const timestampDisplay = document.getElementById('searchTimestamp');
+    
+    if (searchNameDisplay) {
+        searchNameDisplay.textContent = 'To Save';
+    }
+    
+    if (timestampDisplay) {
+        const displayDate = new Date(fetchTimestamp).toLocaleString();
+        timestampDisplay.textContent = `Fetch Time: ${displayDate}`;
+    }
+}
+
+export async function handleFormSubmit(event) {
+    if (event) event.preventDefault();
     showLoading();
 
     try {
+        // Store fetch timestamp at the start of the fetch
+        storeFetchTimestamp();
+
         const formData = {
             search_terms: document.getElementById('search_terms').value || 'all',
             ad_active_status: document.getElementById('ad_active_status').value,
@@ -102,9 +123,8 @@ export async function handleFormSubmit(e) {
             throw new Error(data.error.message || 'Failed to fetch ads');
         }
 
-        console.log('Received ads data:', data); // Debug log
+        console.log('Received ads data:', data);
         
-        // Ensure data.data exists and is an array
         if (!data.data || !Array.isArray(data.data)) {
             throw new Error('Invalid data format received from server');
         }

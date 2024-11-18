@@ -15,6 +15,12 @@ async function saveCurrentSearch() {
     if (!searchName) return;
 
     try {
+        // Get the original fetch timestamp
+        const fetchTimestamp = localStorage.getItem('currentFetchTimestamp');
+        if (!fetchTimestamp) {
+            throw new Error('No fetch timestamp found');
+        }
+
         // Check for existing search
         const response = await fetch('/api/saved-searches');
         if (!response.ok) throw new Error('Failed to fetch saved searches');
@@ -53,7 +59,8 @@ async function saveCurrentSearch() {
 
         const searchData = {
             name: searchName,
-            timestamp: new Date().toISOString(),
+            fetchTimestamp: fetchTimestamp,
+            saveTimestamp: new Date().toISOString(),
             parameters,
             results: state.currentAdsData,
             filtered: {
@@ -78,10 +85,16 @@ async function saveCurrentSearch() {
 
         // Update UI elements
         const searchNameDisplay = document.getElementById('currentSearchName');
+        const timestampDisplay = document.getElementById('searchTimestamp');
+        
         if (searchNameDisplay) {
             searchNameDisplay.textContent = searchName;
         }
-        localStorage.setItem('currentSearchName', searchName);
+        
+        if (timestampDisplay) {
+            const displayDate = new Date(fetchTimestamp).toLocaleString();
+            timestampDisplay.textContent = `Fetch Time: ${displayDate}`;
+        }
 
         showSuccessToast('Search saved successfully');
         
@@ -136,17 +149,20 @@ async function loadSavedSearch(searchId) {
         }
         const { token: currentToken } = await tokenResponse.json();
 
-        const response = await fetch(`/api/saved-searches/${searchId}`);
+        // Ensure searchId includes 'search_' prefix if it doesn't already
+        const fullSearchId = searchId.startsWith('search_') ? searchId : `search_${searchId}`;
+        
+        // Add .json extension if not present
+        const searchIdWithExt = fullSearchId.endsWith('.json') ? fullSearchId : `${fullSearchId}.json`;
+
+        const response = await fetch(`/api/saved-searches/${searchIdWithExt}`);
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error('Failed to load search');
         }
-        
+
         const searchData = await response.json();
-        console.log('Loaded search data:', searchData);
-        
         if (!validateSearchData(searchData)) {
-            console.error('Invalid search data structure:', searchData);
-            throw new Error('Invalid search data structure');
+            throw new Error('Invalid search data format');
         }
 
         // Update URLs with current token in search results
@@ -162,7 +178,6 @@ async function loadSavedSearch(searchId) {
         }
 
         const formFields = {
-            'access_token': searchData.parameters?.access_token || '',
             'search_terms': searchData.parameters?.search_terms || '',
             'ad_active_status': searchData.parameters?.ad_active_status || '',
             'ad_delivery_date_min': searchData.parameters?.ad_delivery_date_min || '',
@@ -171,8 +186,6 @@ async function loadSavedSearch(searchId) {
         };
 
         Object.entries(formFields).forEach(([fieldId, value]) => {
-            if (fieldId === 'access_token') return;
-            
             const element = document.getElementById(fieldId);
             if (element) {
                 element.value = value;
@@ -181,64 +194,32 @@ async function loadSavedSearch(searchId) {
             }
         });
 
-        if (formFields.access_token) {
-            await updateAccessTokens();
-        }
-
         if (Array.isArray(searchData.results)) {
             state.currentAdsData = searchData.results;
-            
-            if (state.adsTable) {
-                state.adsTable.clear();
-            }
-
-            state.filteredPages = new Set(searchData.filtered?.pages || []);
-            state.filteredAds = new Set(searchData.filtered?.ads || []);
-
-            if (searchData.permFiltered?.pages) {
-                for (const pageName of searchData.permFiltered.pages) {
-                    try {
-                        await fetch('/api/perma-filter', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ pageName })
-                        });
-                    } catch (error) {
-                        console.warn(`Failed to set permanent filter for ${pageName}:`, error);
-                    }
-                }
-            }
-
-            searchData.results.forEach(ad => {
-                const isPermFiltered = searchData.permFiltered?.pages?.includes(ad.page_name);
-                if (!state.filteredAds.has(ad.id) && 
-                    !state.filteredPages.has(ad.page_name) &&
-                    !isPermFiltered) {
-                    state.adsTable.row.add({
-                        ...ad,
-                        search_timestamp: searchData.timestamp
-                    });
-                }
-            });
-
-            state.adsTable.draw();
-            updateFilteredView();
-            updateResults(searchData.results);
-            
-            showSuccessToast('Search loaded successfully with updated token');
+            await updateResults(searchData.results);
         } else {
             throw new Error('Results data is not an array');
         }
 
-        // Update the current search name
+        // Update localStorage
         localStorage.setItem('currentSearchName', searchData.name);
+        localStorage.setItem('currentFetchTimestamp', searchData.fetchTimestamp);
+
+        // Update UI displays
         const searchNameDisplay = document.getElementById('currentSearchName');
+        const timestampDisplay = document.getElementById('searchTimestamp');
+        
         if (searchNameDisplay) {
             searchNameDisplay.textContent = searchData.name;
         }
+        
+        if (timestampDisplay && searchData.fetchTimestamp) {
+            const displayDate = new Date(searchData.fetchTimestamp).toLocaleString();
+            timestampDisplay.textContent = `Fetch Time: ${displayDate}`;
+        }
 
-        // Store the timestamp for the loaded search
-        localStorage.setItem('currentSearchTimestamp', searchData.timestamp);
+        showSuccessToast('Search loaded successfully');
+
     } catch (error) {
         console.error('Error loading saved search:', error);
         showErrorToast(`Failed to load search: ${error.message}`);
@@ -258,24 +239,35 @@ async function loadSavedSearchesList() {
         
         searchesList.innerHTML = '';
         
-        searches.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        // Sort by save timestamp
+        searches.sort((a, b) => {
+            const dateA = new Date(b.saveTimestamp || b.timestamp || 0);
+            const dateB = new Date(a.saveTimestamp || a.timestamp || 0);
+            return dateA - dateB;
+        });
         
         searches.forEach(search => {
-            // Extract the timestamp from the filename
-            const timestamp = search.id.split('_')[1]?.replace('.json', '');
-            
+            // Get timestamps from the search data
+            const fetchDate = search.fetchTimestamp ? 
+                new Date(search.fetchTimestamp).toLocaleString() : 
+                'No fetch date';
+            const saveDate = search.saveTimestamp ? 
+                new Date(search.saveTimestamp).toLocaleString() : 
+                'No save date';
+
             const searchItem = document.createElement('div');
             searchItem.className = 'search-item';
             searchItem.innerHTML = `
                 <div class="search-info">
-                    <strong>${search.name}</strong>
-                    <small>${new Date(search.timestamp).toLocaleString()}</small>
+                    <strong>${search.name || 'Unnamed Search'}</strong>
+                    <small>Fetched: ${fetchDate}</small>
+                    <small>Saved: ${saveDate}</small>
                 </div>
                 <div class="search-actions">
-                    <button class="load-btn" data-timestamp="${timestamp}">
+                    <button class="load-btn" data-id="${search.id}">
                         <i class="fas fa-download"></i> Load
                     </button>
-                    <button class="delete-btn" data-timestamp="${timestamp}">
+                    <button class="delete-btn" data-id="${search.id}">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -343,9 +335,17 @@ function validateSearchData(data) {
 // Add this to clear the name when starting a new search
 export function clearCurrentSearchName() {
     localStorage.removeItem('currentSearchName');
+    localStorage.removeItem('currentFetchTimestamp');
+    
     const searchNameDisplay = document.getElementById('currentSearchName');
+    const timestampDisplay = document.getElementById('searchTimestamp');
+    
     if (searchNameDisplay) {
         searchNameDisplay.textContent = 'To Save';
+    }
+    
+    if (timestampDisplay) {
+        timestampDisplay.textContent = '';
     }
 }
 

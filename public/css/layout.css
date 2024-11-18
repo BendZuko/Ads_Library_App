@@ -37,6 +37,13 @@
     color: #333;
 }
 
+.search-timestamp {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.25rem;
+    padding-left: 0.5rem;
+}
+
 .view-section {
     padding: 20px;
     background: white;
@@ -44,4 +51,24 @@
     box-shadow: var(--shadow-lg);
     margin: 20px;
     overflow-x: auto;
+}
+
+.current-search-container {
+    background: white;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+}
+
+.current-search-container h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.search-timestamp {
+    margin-top: 5px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
 }

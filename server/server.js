@@ -68,93 +68,86 @@ app.post('/api/fetch-ads', async (req, res) => {
             fields
         } = req.body;
 
+        // Validate required parameters
         if (!currentAccessToken) {
-            console.error('No server access token available');
-            return res.status(400).json({ error: { message: 'No access token available on server' }});
+            throw new Error('Access token not available');
         }
 
-        let allAds = [];
-        let pageCount = 0;
-        
-        // Construct initial URL with parameters
-        let baseUrl = 'https://graph.facebook.com/v18.0/ads_archive';
-        let params = new URLSearchParams({
-            access_token: currentAccessToken,  // Always use server token
-            search_terms: search_terms || '',
+        // Construct the Facebook API URL
+        const baseUrl = 'https://graph.facebook.com/v18.0/ads_archive';
+        const queryParams = new URLSearchParams({
+            access_token: currentAccessToken,
+            search_terms: search_terms || 'all',
             ad_active_status: ad_active_status || 'ALL',
             ad_delivery_date_min: ad_delivery_date_min || '',
             ad_reached_countries: ad_reached_countries || '',
-            languages: ad_language ? [ad_language] : [],
-            fields: fields || '',
+            ad_type: 'ALL',
+            fields: fields || 'ad_creation_time,page_name,ad_snapshot_url,eu_total_reach',
+            limit: '1000'  // Adjust as needed
         });
 
-        let nextPage = `${baseUrl}?${params.toString()}`;
-        console.log('Initial URL:', nextPage);
+        // Remove empty parameters
+        Array.from(queryParams.entries()).forEach(([key, value]) => {
+            if (!value) queryParams.delete(key);
+        });
 
-        while (nextPage && pageCount < 10) {
-            pageCount++;
-            console.log(`\nFetching page ${pageCount}...`);
-            
-            try {
-                // Always ensure ad_language is in the URL
-                const currentUrl = new URL(nextPage);
-                if (ad_language) {
-                    currentUrl.searchParams.set('languages', [ad_language]);
-                }
-                nextPage = currentUrl.toString();
-                
-                const response = await axios.get(nextPage);
-                
-                if (!response.data || !response.data.data) {
-                    console.error('Invalid response:', response.data);
-                    break;
-                }
+        const apiUrl = `${baseUrl}?${queryParams.toString()}`;
+        console.log('Fetching from URL:', apiUrl);
 
-                const pageAds = response.data.data;
-                console.log(`Page ${pageCount}: Retrieved ${pageAds.length} ads`);
-                allAds = [...allAds, ...pageAds];
-                
-                // Get next page URL and ensure it includes ad_language
-                nextPage = response.data.paging?.next || null;
-                if (nextPage) {
-                    const nextUrl = new URL(nextPage);
-                    if (ad_language) {
-                        nextUrl.searchParams.set('languages', [ad_language]);
-                    }
-                    nextPage = nextUrl.toString();
-                }
-                
-                console.log('Next page URL:', nextPage);
+        const response = await axios.get(apiUrl, {
+            timeout: 30000, // 30 second timeout
+            validateStatus: status => status < 500 // Only reject if status >= 500
+        });
 
-                if (!nextPage) {
-                    console.log('No more pages to fetch');
-                    break;
+        // Check for API errors
+        if (response.data.error) {
+            console.error('Facebook API Error:', response.data.error);
+            return res.status(400).json({
+                error: {
+                    message: response.data.error.message || 'Facebook API Error'
                 }
-
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-            } catch (error) {
-                console.error(`Error fetching page ${pageCount}:`, error.response?.data || error);
-                break;
-            }
+            });
         }
 
-        console.log('\nFinal response:', {
-            totalAds: allAds.length,
-            totalPages: pageCount
-        });
-        
+        // Add timestamp to each result
+        const timestamp = new Date().toISOString();
+        const enrichedData = response.data.data.map(ad => ({
+            ...ad,
+            search_timestamp: timestamp,
+            id: ad.id || crypto.randomUUID()
+        }));
+
+        // Send the response
         res.json({
-            data: allAds,
-            paging: null  // We've already fetched all pages
+            data: enrichedData,
+            paging: response.data.paging
         });
 
     } catch (error) {
-        console.error('Error in fetch-ads:', error.response?.data || error);
-        res.status(error.response?.status || 500).json({ 
+        console.error('Error fetching ads:', error);
+        
+        // Determine appropriate error message and status
+        let statusCode = 500;
+        let errorMessage = 'Internal server error';
+
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            statusCode = error.response.status;
+            errorMessage = error.response.data?.error?.message || 'API request failed';
+        } else if (error.request) {
+            // The request was made but no response was received
+            statusCode = 503;
+            errorMessage = 'No response from Facebook API';
+        } else {
+            // Something happened in setting up the request
+            statusCode = 400;
+            errorMessage = error.message;
+        }
+
+        res.status(statusCode).json({
             error: {
-                message: error.response?.data?.error?.message || 'Failed to fetch ads',
-                details: error.response?.data
+                message: errorMessage,
+                details: process.env.NODE_ENV === 'development' ? error.toString() : undefined
             }
         });
     }
@@ -270,22 +263,23 @@ app.post('/api/download-video', async (req, res) => {
 app.post('/api/save-search', async (req, res) => {
     try {
         const searchData = req.body;
-        if (!searchData || !searchData.name) {
+        if (!searchData || !searchData.name || !searchData.fetchTimestamp) {
             return res.status(400).json({ message: 'Invalid search data' });
         }
 
         const filename = `search_${Date.now()}.json`;
         const filePath = path.join(SAVED_SEARCHES_DIR, filename);
 
-        // Ensure directory exists
-        if (!fs.existsSync(SAVED_SEARCHES_DIR)) {
-            fs.mkdirSync(SAVED_SEARCHES_DIR, { recursive: true });
-        }
+        // Ensure both timestamps are present
+        const dataToSave = {
+            ...searchData,
+            fetchTimestamp: searchData.fetchTimestamp,
+            saveTimestamp: new Date().toISOString()
+        };
 
-        // Save the file
         await fs.promises.writeFile(
             filePath,
-            JSON.stringify(searchData, null, 2),
+            JSON.stringify(dataToSave, null, 2),
             'utf8'
         );
 
@@ -300,10 +294,17 @@ app.post('/api/save-search', async (req, res) => {
 });
 app.get('/api/saved-searches/:id', (req, res) => {
     try {
-        const searchId = req.params.id;
-        // Check if the ID already includes 'search_' prefix and '.json' extension
-        const filename = searchId.includes('search_') ? searchId : `search_${searchId}.json`;
-        const filepath = path.join(SAVED_SEARCHES_DIR, filename);
+        let searchId = req.params.id;
+        
+        // Ensure proper filename format
+        if (!searchId.startsWith('search_')) {
+            searchId = `search_${searchId}`;
+        }
+        if (!searchId.endsWith('.json')) {
+            searchId = `${searchId}.json`;
+        }
+
+        const filepath = path.join(SAVED_SEARCHES_DIR, searchId);
         
         console.log('Looking for saved search file:', filepath);
         
@@ -334,19 +335,19 @@ app.get('/api/saved-searches', (req, res) => {
                     const filepath = path.join(SAVED_SEARCHES_DIR, file);
                     const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
                     return {
-                        id: file,
+                        id: file.replace('.json', ''),
                         name: data.name || 'Unnamed Search',
-                        timestamp: data.timestamp || new Date().toISOString(),
+                        fetchTimestamp: data.fetchTimestamp,
+                        saveTimestamp: data.saveTimestamp,
                         parameters: data.parameters || {},
-                        results: Array.isArray(data.results) ? data.results : [],
-                        filtered: data.filtered || { pages: [], ads: [] }
+                        results: Array.isArray(data.results) ? data.results : []
                     };
                 } catch (error) {
                     console.warn(`Error processing file ${file}:`, error);
                     return null;
                 }
             })
-            .filter(search => search !== null); // Remove any invalid entries
+            .filter(search => search !== null);
         
         res.json(searches);
     } catch (error) {
@@ -354,7 +355,6 @@ app.get('/api/saved-searches', (req, res) => {
         res.status(500).json({ error: 'Failed to load searches' });
     }
 });
-
 app.delete('/api/saved-searches/:id', (req, res) => {
     try {
         const filepath = path.join(SAVED_SEARCHES_DIR, req.params.id);
@@ -512,3 +512,4 @@ const startServer = async () => {
 
 // Call startServer instead of app.listen
 startServer();
+

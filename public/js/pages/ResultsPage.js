@@ -6,6 +6,7 @@ let isLoadingVideos = false;
 let loadingInterval = null;
 let currentLoadingPromise = null;
 let savedSearchesCache = null;
+let currentVideoRequest = null;
 
 export function initializeDataTable() {
     console.log('Initializing DataTable');
@@ -130,6 +131,12 @@ export function initializeDataTable() {
             },
             responsive: {
                 details: false
+            },
+            drawCallback: function(settings) {
+                // Update stats after table is drawn
+                if (typeof updateTableStats === 'function') {
+                    updateTableStats();
+                }
             }
         });
         
@@ -146,15 +153,23 @@ export function initializeDataTable() {
                     if (cell) {
                         // Get all historical reach data including current
                         const allReachData = [
+                            // Current data
                             {
-                                date: new Date(row.search_timestamp),
-                                reach: row.eu_total_reach
+                                date: new Date(row.search_timestamp || Date.now()),
+                                reach: row.eu_total_reach || 0,
+                                isCurrent: true
                             },
+                            // Historical data from saved searches
                             ...searches
-                                .filter(search => search.results.some(ad => ad.id === row.id))
+                                .filter(search => 
+                                    search.results && 
+                                    Array.isArray(search.results) && 
+                                    search.results.some(ad => ad.id === row.id)
+                                )
                                 .map(search => ({
-                                    date: new Date(search.timestamp),
-                                    reach: search.results.find(ad => ad.id === row.id).eu_total_reach
+                                    date: new Date(search.fetchTimestamp || search.timestamp || search.saveTimestamp),
+                                    reach: search.results.find(ad => ad.id === row.id)?.eu_total_reach || 0,
+                                    isCurrent: false
                                 }))
                         ];
 
@@ -168,13 +183,15 @@ export function initializeDataTable() {
                             )
                         );
 
+                        // Format the content with styling
                         const content = `
                             <div class="stats-container">
-                                ${uniqueReachData.map(data => 
-                                    `<div class="stat-entry">
+                                ${uniqueReachData.map(data => `
+                                    <div class="stat-entry${data.isCurrent ? ' current' : ''}">
                                         ${data.date.toLocaleDateString()}: ${data.reach.toLocaleString()}
-                                    </div>`
-                                ).join('')}
+                                        ${data.isCurrent ? ' (Current)' : ''}
+                                    </div>
+                                `).join('')}
                             </div>`;
                         
                         cell.innerHTML = content;
@@ -199,6 +216,11 @@ export function initializeDataTable() {
 
 export async function loadVideo(videoUrl, buttonElement) {
     try {
+        // Check if video is already loaded
+        if (buttonElement.classList.contains('loaded')) {
+            return true;
+        }
+
         buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
         buttonElement.disabled = true;
 
@@ -211,30 +233,34 @@ export async function loadVideo(videoUrl, buttonElement) {
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to fetch video URL: ${response.statusText}`);
+            throw new Error(`Failed to fetch video: ${response.statusText}`);
         }
 
         const data = await response.json();
         
-        if (data.videoUrl) {
-            const videoContainer = buttonElement.nextElementSibling;
-            videoContainer.style.display = 'block';
-            videoContainer.innerHTML = `
-                <video controls style="width: 100%; max-height: 200px;">
-                    <source src="${data.videoUrl}" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>`;
-            buttonElement.style.display = 'none';
-            buttonElement.classList.add('loaded');
-            return true;
-        } else {
+        if (!data.videoUrl) {
             throw new Error('No video URL returned');
         }
+
+        const videoContainer = buttonElement.nextElementSibling;
+        videoContainer.style.display = 'block';
+        videoContainer.innerHTML = `
+            <video controls style="width: 100%; max-height: 200px;">
+                <source src="${data.videoUrl}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>`;
+        
+        buttonElement.style.display = 'none';
+        buttonElement.setAttribute('data-loaded', 'true');
+        buttonElement.classList.add('loaded');
+        return true;
+
     } catch (error) {
         console.error('Error loading video:', error);
         buttonElement.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
         buttonElement.classList.add('error');
         buttonElement.disabled = false;
+        showErrorToast(`Failed to load video: ${error.message}`);
         return false;
     }
 }
@@ -243,11 +269,10 @@ export async function loadAllVideos() {
     const loadButton = document.querySelector('.load-all-videos-btn');
     
     if (isLoadingVideos) {
-        // Stop loading process
+        // Immediate stop
         isLoadingVideos = false;
-        if (loadingInterval) {
-            clearTimeout(loadingInterval);
-            loadingInterval = null;
+        if (currentVideoRequest) {
+            currentVideoRequest.abort(); // Abort the current fetch request
         }
         loadButton.innerHTML = '<i class="fas fa-play-circle"></i> Load All Videos';
         loadButton.classList.remove('loading');
@@ -255,53 +280,55 @@ export async function loadAllVideos() {
         return;
     }
 
-    const videoButtons = document.querySelectorAll('.video-btn:not([data-loaded="true"]):not(.error)');
+    const videoButtons = Array.from(document.querySelectorAll('.video-btn:not(.loaded):not(.error)'));
     if (!videoButtons.length) {
-        showWarningToast('No videos to load');
+        showWarningToast('No new videos to load');
         return;
     }
 
-    // Start loading process
     isLoadingVideos = true;
     let loadedCount = 0;
     const totalVideos = videoButtons.length;
+    const failedVideos = [];
 
     loadButton.innerHTML = `<i class="fas fa-stop-circle"></i> Stop Loading (${loadedCount}/${totalVideos})`;
     loadButton.classList.add('loading');
 
-    for (const button of videoButtons) {
-        if (!isLoadingVideos) {
-            break; // Stop if loading was cancelled
-        }
-
-        try {
-            // Skip if already loaded
-            if (button.getAttribute('data-loaded') === 'true') continue;
-
-            // Extract video URL from onclick attribute
-            const onClickAttr = button.getAttribute('onclick');
-            const urlMatch = onClickAttr.match(/loadVideo\('([^']+)'/);
-            if (!urlMatch) continue;
-
-            const videoUrl = urlMatch[1];
+    try {
+        for (const button of videoButtons) {
+            if (!isLoadingVideos) break;
 
             try {
-                // Attempt to load the video
-                button.disabled = true;
-                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                const onClickAttr = button.getAttribute('onclick');
+                const urlMatch = onClickAttr.match(/loadVideo\('([^']+)'/);
+                if (!urlMatch) continue;
 
-                const response = await fetch('/api/fetch-video', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ url: videoUrl })
-                });
+                const videoUrl = urlMatch[1];
 
-                if (!response.ok) throw new Error('Failed to fetch video URL');
-                const data = await response.json();
-                
-                if (data.videoUrl) {
+                // Create AbortController for this request
+                const controller = new AbortController();
+                currentVideoRequest = controller;
+
+                try {
+                    const response = await fetch('/api/fetch-video', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ url: videoUrl }),
+                        signal: controller.signal // Add abort signal to fetch
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    if (!data.videoUrl) {
+                        throw new Error('No video URL returned');
+                    }
+
                     const videoContainer = button.nextElementSibling;
                     videoContainer.style.display = 'block';
                     videoContainer.innerHTML = `
@@ -309,40 +336,56 @@ export async function loadAllVideos() {
                             <source src="${data.videoUrl}" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>`;
+                    
                     button.style.display = 'none';
                     button.classList.add('loaded');
-                } else {
-                    throw new Error('No video URL returned');
+                    loadedCount++;
+                    loadButton.innerHTML = `<i class="fas fa-stop-circle"></i> Stop Loading (${loadedCount}/${totalVideos})`;
+
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        console.log('Fetch aborted');
+                        break; // Exit the loop on abort
+                    }
+                    throw error; // Re-throw other errors
                 }
 
-                loadedCount++;
-                loadButton.innerHTML = `<i class="fas fa-stop-circle"></i> Stop Loading (${loadedCount}/${totalVideos})`;
+                // Clear the current request reference
+                currentVideoRequest = null;
+
+                // Add delay between videos
+                if (isLoadingVideos && loadedCount < totalVideos) {
+                    await new Promise((resolve, reject) => {
+                        const timeoutId = setTimeout(resolve, 200 + Math.random() * 1000);
+                        // Allow the delay to be cancelled
+                        if (!isLoadingVideos) {
+                            clearTimeout(timeoutId);
+                            reject(new Error('Loading stopped'));
+                        }
+                    });
+                }
 
             } catch (error) {
+                if (!isLoadingVideos) break; // Exit if loading was stopped
                 console.error('Error loading video:', error);
+                failedVideos.push(button);
                 button.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
                 button.classList.add('error');
-                button.disabled = false;
-                showErrorToast(`Failed to load video: ${error.message}`);
             }
-
-            // Add random delay between videos (1-2 seconds)
-            if (isLoadingVideos && videoButtons[loadedCount]) {
-                await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
-            }
-
-        } catch (error) {
-            console.error('Error in video loading loop:', error);
         }
-    }
+    } finally {
+        // Cleanup
+        isLoadingVideos = false;
+        currentVideoRequest = null;
+        loadButton.innerHTML = '<i class="fas fa-play-circle"></i> Load All Videos';
+        loadButton.classList.remove('loading');
 
-    // Reset button state after completion
-    isLoadingVideos = false;
-    loadButton.innerHTML = '<i class="fas fa-play-circle"></i> Load All Videos';
-    loadButton.classList.remove('loading');
-    
-    if (loadedCount > 0) {
-        showSuccessToast(`Successfully loaded ${loadedCount} videos`);
+        // Show final status
+        if (loadedCount > 0) {
+            showSuccessToast(`Successfully loaded ${loadedCount} videos${failedVideos.length > 0 ? `, ${failedVideos.length} failed` : ''}`);
+        } else if (failedVideos.length > 0) {
+            showErrorToast(`Failed to load ${failedVideos.length} videos`);
+        }
     }
 }
 
@@ -399,11 +442,11 @@ export async function updateResults(ads) {
         console.log('Adding rows to table');
         state.adsTable.clear();
         
-        // Get the current search timestamp from localStorage
-        const searchTimestamp = localStorage.getItem('currentSearchTimestamp');
+        // Get the fetch timestamp
+        const fetchTimestamp = localStorage.getItem('currentFetchTimestamp');
         
         const transformedData = visibleAds.map(ad => ({
-            search_timestamp: searchTimestamp,
+            search_timestamp: fetchTimestamp,
             ad_creation_time: ad.ad_creation_time,
             page_name: ad.page_name,
             eu_total_reach: ad.eu_total_reach,
@@ -552,4 +595,18 @@ async function saveCurrentSearch() {
     clearSavedSearchesCache();
     
     // ... rest of the function ...
+}
+
+export function clearCurrentSearchName() {
+    localStorage.removeItem('currentSearchName');
+    const searchNameDisplay = document.getElementById('currentSearchName');
+    const timestampDisplay = document.getElementById('searchTimestamp');
+    
+    if (searchNameDisplay) {
+        searchNameDisplay.textContent = 'To Save';
+    }
+    
+    if (timestampDisplay) {
+        timestampDisplay.textContent = '';
+    }
 }
