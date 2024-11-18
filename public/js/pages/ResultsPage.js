@@ -71,6 +71,7 @@ export function initializeDataTable() {
                     title: 'Actions',
                     width: '250px',
                     className: 'dt-center all',
+                    orderable: false,
                     render: function(data, type, row) {
                         return `
                             <div class="table-actions">
@@ -87,6 +88,23 @@ export function initializeDataTable() {
                                     <i class="fas fa-ban"></i> Perm Filter Page
                                 </button>
                             </div>`;
+                    }
+                },
+                { 
+                    data: null,
+                    title: 'Stats',
+                    width: '150px',
+                    className: 'dt-center all',
+                    orderable: true,
+                    render: function(data, type, row) {
+                        if (type === 'sort') {
+                            return row.reachChangePercent || 0;
+                        }
+                        if (type === 'display') {
+                            const cellId = `stats-${row.id}`;
+                            return `<div id="${cellId}"><i class="fas fa-spinner fa-spin"></i> Calculating...</div>`;
+                        }
+                        return row.reachChangePercent || 0;
                     }
                 }
             ],
@@ -147,19 +165,19 @@ export function initializeDataTable() {
                 
                 table.rows({ page: 'current' }).every(function() {
                     const row = this.data();
-                    const cellId = `reach-${row.id}`;
-                    const cell = document.getElementById(cellId);
+                    const reachCellId = `reach-${row.id}`;
+                    const statsCellId = `stats-${row.id}`;
+                    const reachCell = document.getElementById(reachCellId);
+                    const statsCell = document.getElementById(statsCellId);
                     
-                    if (cell) {
+                    if (reachCell && statsCell) {
                         // Get all historical reach data including current
                         const allReachData = [
-                            // Current data
                             {
                                 fetchTime: new Date(row.search_timestamp || Date.now()),
                                 reach: row.eu_total_reach || 0,
                                 isCurrent: true
                             },
-                            // Historical data from saved searches
                             ...searches
                                 .filter(search => 
                                     search.results && 
@@ -176,8 +194,40 @@ export function initializeDataTable() {
                         // Sort by fetch time, most recent first
                         allReachData.sort((a, b) => b.fetchTime - a.fetchTime);
 
-                        // Format the content with styling
-                        const content = `
+                        // Calculate 7-day change
+                        const sevenDaysAgo = new Date();
+                        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                        
+                        const recentData = allReachData.filter(data => data.fetchTime >= sevenDaysAgo);
+                        
+                        let statsContent = '';
+                        if (recentData.length >= 2) {
+                            const newestReach = recentData[0].reach;
+                            const oldestReach = recentData[recentData.length - 1].reach;
+                            
+                            if (oldestReach > 0) {
+                                const percentChange = ((newestReach - oldestReach) / oldestReach) * 100;
+                                const changeDirection = percentChange >= 0 ? 'increase' : 'decrease';
+                                const absChange = Math.abs(percentChange);
+                                
+                                statsContent = `
+                                    <div class="stats-change ${changeDirection}">
+                                        <i class="fas fa-${percentChange >= 0 ? 'arrow-up' : 'arrow-down'}"></i>
+                                        ${absChange.toFixed(1)}%
+                                        <div class="stats-period">7-day change</div>
+                                    </div>
+                                `;
+                            } else {
+                                statsContent = '<div class="stats-na">No previous data</div>';
+                            }
+                        } else {
+                            statsContent = '<div class="stats-na">Insufficient data</div>';
+                        }
+                        
+                        statsCell.innerHTML = statsContent;
+
+                        // Update reach history display
+                        const reachContent = `
                             <div class="stats-container">
                                 ${allReachData.map(data => `
                                     <div class="stat-entry${data.isCurrent ? ' current' : ''}">
@@ -187,11 +237,11 @@ export function initializeDataTable() {
                                 `).join('')}
                             </div>`;
                         
-                        cell.innerHTML = content;
+                        reachCell.innerHTML = reachContent;
                     }
                 });
             } catch (error) {
-                console.error('Error updating reach history:', error);
+                console.error('Error updating reach history and stats:', error);
             }
         });
 
@@ -602,4 +652,24 @@ export function clearCurrentSearchName() {
     if (timestampDisplay) {
         timestampDisplay.textContent = '';
     }
+}
+
+function updateStatsCell(rowId, statsData) {
+    const table = $('#resultsTable').DataTable();
+    const row = table.row(`#stats-${rowId}`).data();
+    
+    // Store the numeric value for sorting
+    row.reachChangePercent = statsData.changePercent;
+    
+    // Update the visible cell content
+    $(`#stats-${rowId}`).html(`
+        <div class="stats-change ${statsData.changePercent > 0 ? 'increase' : 'decrease'}">
+            <i class="fas fa-arrow-${statsData.changePercent > 0 ? 'up' : 'down'}"></i>
+            ${Math.abs(statsData.changePercent).toFixed(2)}%
+        </div>
+        <div class="stats-period">Last 7 days</div>
+    `);
+    
+    // Update the row data in the DataTable
+    table.row(`#stats-${rowId}`).data(row);
 }
