@@ -138,6 +138,9 @@
                     <button class="filtered-view-btn">
                         <i class="fas fa-filter"></i> Filtered
                     </button>
+                    <button class="btn btn-secondary perm-filtered-view-btn">
+                        <i class="fas fa-filter"></i> Perm Filtered
+                    </button>
                     <button class="view-saved-btn">
                         <i class="fas fa-history"></i> Saved Searches
                     </button>
@@ -221,12 +224,30 @@
     <div id="savedSearchesSidebar" class="saved-searches-sidebar">
         <div class="sidebar-header">
             <h3>Saved Searches</h3>
-            <button onclick="toggleSavedSearches()" class="close-btn">
+            <button class="close-btn">
                 <i class="fas fa-times"></i>
             </button>
         </div>
         <div id="searchesList" class="searches-list">
             <!-- Saved searches will be loaded here -->
+        </div>
+    </div>
+
+    <div id="permFilteredModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Permanently Filtered Items</h3>
+                <button onclick="closePermFilteredView()" class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="filter-section">
+                    <h4>Filtered Pages</h4>
+                    <div class="search-bar">
+                        <input type="text" id="permPageSearch" placeholder="Search page names...">
+                    </div>
+                    <div id="permFilteredPages"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -249,7 +270,11 @@
             loadVideo,
             downloadCSV,
             openFilteredView,
-            closeFilteredView
+            closeFilteredView,
+            addToPermaFilter,
+            openPermFilteredView,
+            closePermFilteredView,
+            unPermFilterPage
         } from './js/app.js';
 
         import { updateAccessTokens } from './js/components/FormHandler.js';
@@ -273,6 +298,10 @@
         window.openFilteredView = openFilteredView;
         window.closeFilteredView = closeFilteredView;
         window.updateAccessTokens = updateAccessTokens;
+        window.addToPermaFilter = addToPermaFilter;
+        window.openPermFilteredView = openPermFilteredView;
+        window.closePermFilteredView = closePermFilteredView;
+        window.unPermFilterPage = unPermFilterPage;
 
         // Add all event listeners after DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
@@ -283,6 +312,7 @@
             document.querySelector('.filtered-view-btn').addEventListener('click', openFilteredView);
             document.querySelector('.view-saved-btn').addEventListener('click', toggleSavedSearches);
             document.querySelector('.load-all-videos-btn').addEventListener('click', loadAllVideos);
+            document.querySelector('.perm-filtered-view-btn').addEventListener('click', openPermFilteredView);
         });
     </script>
 </body>

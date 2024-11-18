@@ -1,5 +1,5 @@
 import { state } from '../app.js';
-import { showErrorToast, showSuccessToast, showWarningToast } from '../components/Toast.js';
+import { showErrorToast, showSuccessToast, showWarningToast, showToast } from '../components/Toast.js';
 import { updateTableStats } from '../components/FilteredModal.js';
 
 let isLoadingVideos = false;
@@ -57,17 +57,19 @@ export function initializeDataTable() {
                     width: '25%',
                     className: 'dt-center all',
                     render: function(data, type, row) {
-                        if (!row.ad_snapshot_url || !row.id) return '';
                         return `
                             <div class="table-actions">
-                                <button class="action-btn view-btn" onclick="window.open('${row.ad_snapshot_url}', '_blank')">
-                                    <i class="fas fa-eye"></i> View
-                                </button>
-                                <button class="action-btn filter-btn" onclick="filterAd('${row.id}')">
+                                <a href="${row.ad_snapshot_url}" target="_blank" class="action-btn view-btn">
+                                    <i class="fas fa-external-link-alt"></i> View
+                                </a>
+                                <button onclick="filterAd('${row.id}')" class="action-btn filter-btn">
                                     <i class="fas fa-filter"></i> Filter
                                 </button>
-                                <button class="action-btn filter-page-btn" onclick="filterPage('${row.page_name}')">
-                                    <i class="fas fa-building"></i> Filter Page
+                                <button onclick="filterPage('${row.page_name}')" class="action-btn filter-page-btn">
+                                    <i class="fas fa-filter"></i> Filter Page
+                                </button>
+                                <button onclick="addToPermaFilter('${row.page_name}')" class="action-btn perm-filter-btn">
+                                    <i class="fas fa-ban"></i> Perm Filter
                                 </button>
                             </div>`;
                     }
@@ -272,7 +274,7 @@ export async function loadAllVideos() {
     }
 }
 
-export function updateResults(ads) {
+export async function updateResults(ads) {
     console.log('Updating results with ads:', ads);
     
     const resultsContainer = document.getElementById('results');
@@ -290,41 +292,62 @@ export function updateResults(ads) {
 
     state.currentAdsData = ads;
     
-    // Filter out ads that should be hidden based on current filters
-    const visibleAds = ads.filter(ad => {
-        // Hide if the ad is filtered
-        if (state.filteredAds.has(ad.id)) return false;
-        // Hide if the ad's page is filtered
-        if (state.filteredPages.has(ad.page_name)) {
-            state.filteredAds.add(ad.id); // Make sure to track these filtered ads
-            return false;
-        }
-        return true;
-    });
+    try {
+        // Fetch permanent filter list
+        const response = await fetch('/api/perma-filter');
+        const { pages: permanentlyFiltered } = await response.json();
+        console.log('Permanently filtered pages:', permanentlyFiltered);
 
-    // Initialize table with filtered data
-    state.adsTable = initializeDataTable();
-    
-    console.log('Adding rows to table');
-    state.adsTable.clear();
-    
-    const transformedData = visibleAds.map(ad => ({
-        ad_creation_time: ad.ad_creation_time,
-        page_name: ad.page_name,
-        eu_total_reach: ad.eu_total_reach,
-        ad_snapshot_url: ad.ad_snapshot_url,
-        id: ad.id
-    }));
-    
-    state.adsTable.rows.add(transformedData).draw();
-    
-    // Add a small delay before updating stats
-    setTimeout(() => {
-        updateTableStats();
-        console.log('Stats updated after delay');
-    }, 100); // 100ms delay
-    
-    console.log('Table updated');
+        // Filter out ads that should be hidden
+        const visibleAds = ads.filter(ad => {
+            // Hide if the ad's page is permanently filtered
+            if (permanentlyFiltered.includes(ad.page_name)) {
+                console.log(`Filtering out ad from ${ad.page_name} (permanently filtered)`);
+                return false;
+            }
+            // Hide if the ad is filtered
+            if (state.filteredAds.has(ad.id)) {
+                console.log(`Filtering out ad ${ad.id} (filtered)`);
+                return false;
+            }
+            // Hide if the ad's page is filtered
+            if (state.filteredPages.has(ad.page_name)) {
+                state.filteredAds.add(ad.id);
+                console.log(`Filtering out ad from ${ad.page_name} (page filtered)`);
+                return false;
+            }
+            return true;
+        });
+
+        console.log('Visible ads after filtering:', visibleAds);
+
+        // Initialize table with filtered data
+        state.adsTable = initializeDataTable();
+        
+        console.log('Adding rows to table');
+        state.adsTable.clear();
+        
+        const transformedData = visibleAds.map(ad => ({
+            ad_creation_time: ad.ad_creation_time,
+            page_name: ad.page_name,
+            eu_total_reach: ad.eu_total_reach,
+            ad_snapshot_url: ad.ad_snapshot_url,
+            id: ad.id
+        }));
+        
+        state.adsTable.rows.add(transformedData).draw();
+        
+        console.log('Table updated');
+
+    } catch (error) {
+        console.error('Error applying filters:', error);
+        showToast('Error applying filters', 'error');
+        
+        // If there's an error, show the unfiltered results
+        state.adsTable = initializeDataTable();
+        state.adsTable.clear();
+        state.adsTable.rows.add(ads).draw();
+    }
 }
 
 export function downloadCSV() {
@@ -363,4 +386,61 @@ export function downloadCSV() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+
+function createActionButtons(row) {
+    // ... existing button creation code ...
+    
+    // Add permanent filter button
+    const permFilterBtn = document.createElement('button');
+    permFilterBtn.className = 'btn btn-danger btn-sm';
+    permFilterBtn.textContent = 'Perm Filter';
+    permFilterBtn.onclick = () => addToPermaFilter(row.page_name);
+    
+    actionsCell.appendChild(permFilterBtn);
+    // ... rest of existing code ...
+}
+
+export async function addToPermaFilter(pageName) {
+    try {
+        const response = await fetch('/api/perma-filter', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ pageName })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to add to permanent filter');
+        }
+
+        showToast(`Added "${pageName}" to permanent filter`, 'success');
+        
+        // Refresh the results with current data
+        await updateResults(state.currentAdsData);
+
+    } catch (error) {
+        console.error('Error adding to permanent filter:', error);
+        showToast('Failed to add to permanent filter', 'error');
+    }
+}
+
+// Modify the displayResults function to filter out permanently filtered pages
+async function displayResults(results) {
+    try {
+        // Fetch permanent filter list
+        const response = await fetch('/api/perma-filter');
+        const { pages: permanentlyFiltered } = await response.json();
+
+        // Filter out permanently filtered pages
+        const filteredResults = results.filter(result => 
+            !permanentlyFiltered.includes(result.page_name)
+        );
+
+        // ... rest of existing display logic using filteredResults ...
+    } catch (error) {
+        console.error('Error applying permanent filter:', error);
+        showToast('Error applying permanent filter', 'error');
+    }
 }

@@ -4,12 +4,11 @@ import { updateResults } from '../pages/ResultsPage.js';
 import { updateAccessTokens } from './FormHandler.js';
 import { updateFilteredView } from './FilteredModal.js';
 
-export async function saveCurrentSearch() {
+async function saveCurrentSearch() {
     const searchName = prompt('Enter a name for this search:');
     if (!searchName) return;
 
     try {
-        // Check if search with this name already exists
         const response = await fetch('/api/saved-searches');
         const searches = await response.json();
         const existingSearch = searches.find(search => search.name === searchName);
@@ -18,9 +17,12 @@ export async function saveCurrentSearch() {
             if (!confirm(`A search with name "${searchName}" already exists. Do you want to override it?`)) {
                 return;
             }
-            // If user confirms, delete the existing search
-            await deleteSavedSearch(existingSearch.id, false); // Add 'false' parameter to prevent confirmation dialog
+            await deleteSavedSearch(existingSearch.id, false);
         }
+
+        // Get permanent filter data
+        const permFilterResponse = await fetch('/api/perma-filter');
+        const permFilterData = await permFilterResponse.json();
 
         const searchData = {
             name: searchName,
@@ -37,6 +39,9 @@ export async function saveCurrentSearch() {
             filtered: {
                 pages: Array.from(state.filteredPages),
                 ads: Array.from(state.filteredAds)
+            },
+            permFiltered: {
+                pages: permFilterData.pages || []
             }
         };
 
@@ -48,14 +53,14 @@ export async function saveCurrentSearch() {
 
         if (!saveResponse.ok) throw new Error('Failed to save search');
         showSuccessToast('Search saved successfully');
-        await loadSavedSearches();
+        await loadSavedSearchesList();
     } catch (error) {
         showErrorToast('Failed to save search');
         console.error('Error saving search:', error);
     }
 }
 
-export function toggleSavedSearches() {
+function toggleSavedSearches() {
     const sidebar = document.querySelector('.saved-searches-sidebar');
     if (!sidebar) {
         console.error('Saved searches sidebar not found');
@@ -63,85 +68,107 @@ export function toggleSavedSearches() {
     }
 
     state.savedSearchesSidebarVisible = !state.savedSearchesSidebarVisible;
-    sidebar.style.transform = state.savedSearchesSidebarVisible ? 'translateX(0)' : 'translateX(100%)';
     
     if (state.savedSearchesSidebarVisible) {
-        loadSavedSearches();
+        sidebar.classList.add('visible');
+        loadSavedSearchesList().catch(error => {
+            console.error('Error loading saved searches:', error);
+            showErrorToast('Failed to load saved searches');
+        });
+    } else {
+        sidebar.classList.remove('visible');
     }
 }
 
-export async function loadSavedSearch(searchId) {
+async function loadSavedSearch(searchId) {
     try {
-        // Close the sidebar first for better UX
         toggleSavedSearches();
 
         const response = await fetch(`/api/saved-searches/${searchId}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const searchData = await response.json();
+        console.log('Loaded search data:', searchData);
         
         if (!validateSearchData(searchData)) {
-            throw new Error('Invalid search data');
+            console.error('Invalid search data structure:', searchData);
+            throw new Error('Invalid search data structure');
         }
 
-        // Update form fields if they exist
         const formFields = {
-            'access_token': searchData.parameters?.access_token,
-            'search_terms': searchData.parameters?.search_terms,
-            'ad_active_status': searchData.parameters?.ad_active_status,
-            'ad_delivery_date_min': searchData.parameters?.ad_delivery_date_min,
-            'ad_reached_countries': searchData.parameters?.ad_reached_countries,
-            'fields': searchData.parameters?.fields
+            'access_token': searchData.parameters?.access_token || '',
+            'search_terms': searchData.parameters?.search_terms || '',
+            'ad_active_status': searchData.parameters?.ad_active_status || '',
+            'ad_delivery_date_min': searchData.parameters?.ad_delivery_date_min || '',
+            'ad_reached_countries': searchData.parameters?.ad_reached_countries || '',
+            'fields': searchData.parameters?.fields || ''
         };
 
-        // Safely update each form field
         Object.entries(formFields).forEach(([fieldId, value]) => {
+            if (fieldId === 'access_token') return;
+            
             const element = document.getElementById(fieldId);
-            if (element && value !== undefined) {
+            if (element) {
                 element.value = value;
+            } else {
+                console.warn(`Element not found: ${fieldId}`);
             }
         });
 
-        // Only update access tokens if the field exists and has a value
-        if (document.getElementById('access_token')?.value) {
+        if (formFields.access_token) {
             await updateAccessTokens();
         }
 
-        state.currentAdsData = searchData.results;
-        updateResults(searchData.results);
-        
-        // Display the search name
-        const searchNameContainer = document.querySelector('.current-search-name');
-        const searchNameSpan = document.getElementById('currentSearchName');
-        if (searchNameContainer && searchNameSpan) {
-            searchNameSpan.textContent = searchData.name;
-            searchNameContainer.style.display = 'block';
-        }
-
-        showSuccessToast('Search loaded successfully');
-        
-        // Restore filters
-        state.filteredPages = new Set(searchData.filtered.pages);
-        state.filteredAds = new Set(searchData.filtered.ads);
-        
-        // Update the table to reflect filters
-        state.adsTable.clear();
-        state.currentAdsData.forEach(ad => {
-            if (!state.filteredAds.has(ad.id) && 
-                !state.filteredPages.has(ad.page_name)) {
-                state.adsTable.row.add(ad);
+        if (Array.isArray(searchData.results)) {
+            state.currentAdsData = searchData.results;
+            
+            if (state.adsTable) {
+                state.adsTable.clear();
             }
-        });
-        state.adsTable.draw();
 
-        // Update the filtered view modal
-        updateFilteredView();
-        
+            state.filteredPages = new Set(searchData.filtered?.pages || []);
+            state.filteredAds = new Set(searchData.filtered?.ads || []);
+
+            if (searchData.permFiltered?.pages) {
+                for (const pageName of searchData.permFiltered.pages) {
+                    try {
+                        await fetch('/api/perma-filter', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ pageName })
+                        });
+                    } catch (error) {
+                        console.warn(`Failed to set permanent filter for ${pageName}:`, error);
+                    }
+                }
+            }
+
+            searchData.results.forEach(ad => {
+                const isPermFiltered = searchData.permFiltered?.pages?.includes(ad.page_name);
+                if (!state.filteredAds.has(ad.id) && 
+                    !state.filteredPages.has(ad.page_name) &&
+                    !isPermFiltered) {
+                    state.adsTable.row.add(ad);
+                }
+            });
+
+            state.adsTable.draw();
+            updateFilteredView();
+            updateResults(searchData.results);
+            
+            showSuccessToast('Search loaded successfully');
+        } else {
+            throw new Error('Results data is not an array');
+        }
     } catch (error) {
         console.error('Error loading saved search:', error);
-        showErrorToast('Failed to load search');
+        showErrorToast(`Failed to load search: ${error.message}`);
     }
 }
 
-async function loadSavedSearches() {
+async function loadSavedSearchesList() {
     try {
         const response = await fetch('/api/saved-searches');
         const searches = await response.json();
@@ -157,6 +184,9 @@ async function loadSavedSearches() {
         searches.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         
         searches.forEach(search => {
+            // Extract the timestamp from the filename
+            const timestamp = search.id.split('_')[1]?.replace('.json', '');
+            
             const searchItem = document.createElement('div');
             searchItem.className = 'search-item';
             searchItem.innerHTML = `
@@ -165,17 +195,33 @@ async function loadSavedSearches() {
                     <small>${new Date(search.timestamp).toLocaleString()}</small>
                 </div>
                 <div class="search-actions">
-                    <button class="load-btn">
+                    <button class="load-btn" data-timestamp="${timestamp}">
                         <i class="fas fa-download"></i> Load
                     </button>
-                    <button class="delete-btn">
+                    <button class="delete-btn" data-timestamp="${timestamp}">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
             `;
             
-            searchItem.querySelector('.load-btn').addEventListener('click', () => loadSavedSearch(search.id));
-            searchItem.querySelector('.delete-btn').addEventListener('click', () => deleteSavedSearch(search.id));
+            // Add event listeners using the timestamp
+            const loadBtn = searchItem.querySelector('.load-btn');
+            loadBtn.addEventListener('click', () => {
+                const timestamp = loadBtn.dataset.timestamp;
+                if (timestamp) {
+                    console.log('Loading search with timestamp:', timestamp);
+                    loadSavedSearch(timestamp);
+                }
+            });
+            
+            const deleteBtn = searchItem.querySelector('.delete-btn');
+            deleteBtn.addEventListener('click', () => {
+                const timestamp = deleteBtn.dataset.timestamp;
+                if (timestamp) {
+                    console.log('Deleting search with timestamp:', timestamp);
+                    deleteSavedSearch(`search_${timestamp}.json`);
+                }
+            });
             
             searchesList.appendChild(searchItem);
         });
@@ -186,7 +232,7 @@ async function loadSavedSearches() {
     }
 }
 
-export async function deleteSavedSearch(searchId, showConfirm = true) {
+async function deleteSavedSearch(searchId, showConfirm = true) {
     if (showConfirm && !confirm('Are you sure you want to delete this saved search?')) {
         return;
     }
@@ -202,7 +248,7 @@ export async function deleteSavedSearch(searchId, showConfirm = true) {
         
         if (showConfirm) {
             showSuccessToast('Search deleted successfully');
-            await loadSavedSearches();
+            await loadSavedSearchesList();
         }
     } catch (error) {
         console.error('Error deleting search:', error);
@@ -211,10 +257,29 @@ export async function deleteSavedSearch(searchId, showConfirm = true) {
 }
 
 function validateSearchData(data) {
-    return data && 
-           Array.isArray(data.results) && 
-           data.results.length > 0;
+    if (!data) {
+        console.error('No data provided');
+        return false;
+    }
+    if (!Array.isArray(data.results)) {
+        console.error('Results is not an array:', data.results);
+        return false;
+    }
+    if (data.results.length === 0) {
+        console.error('Results array is empty');
+        return false;
+    }
+    if (!data.parameters) {
+        console.error('No parameters object found');
+        return false;
+    }
+    return true;
 }
 
 export {
+    saveCurrentSearch,
+    toggleSavedSearches,
+    loadSavedSearch,
+    deleteSavedSearch,
+    loadSavedSearchesList
 };

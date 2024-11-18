@@ -53,6 +53,9 @@ if (!fs.existsSync(PERMA_FILTER_FILE)) {
 // Add this near the top after imports
 let currentAccessToken = process.env.FB_ACCESS_TOKEN;
 
+// Add this right after to ensure the token is loaded
+console.log('Initial access token loaded:', currentAccessToken ? 'Yes' : 'No');
+
 // Route to fetch ads from Facebook's Ad Library API
 app.post('/api/fetch-ads', async (req, res) => {
     try {
@@ -62,15 +65,12 @@ app.post('/api/fetch-ads', async (req, res) => {
             ad_delivery_date_min,
             ad_reached_countries,
             ad_language,
-            fields,
-            access_token // We'll still accept this but prefer the server token
+            fields
         } = req.body;
 
-        // Use the provided token or fall back to the server token
-        const tokenToUse = access_token || currentAccessToken;
-
-        if (!tokenToUse) {
-            return res.status(400).json({ error: { message: 'No access token available' }});
+        if (!currentAccessToken) {
+            console.error('No server access token available');
+            return res.status(400).json({ error: { message: 'No access token available on server' }});
         }
 
         let allAds = [];
@@ -79,7 +79,7 @@ app.post('/api/fetch-ads', async (req, res) => {
         // Construct initial URL with parameters
         let baseUrl = 'https://graph.facebook.com/v18.0/ads_archive';
         let params = new URLSearchParams({
-            access_token: tokenToUse,
+            access_token: currentAccessToken,  // Always use server token
             search_terms: search_terms || '',
             ad_active_status: ad_active_status || 'ALL',
             ad_delivery_date_min: ad_delivery_date_min || '',
@@ -438,18 +438,21 @@ const PORT = process.env.PORT || 5004;
 
 async function refreshLongLivedToken() {
     try {
-        const currentToken = process.env.FB_ACCESS_TOKEN;
-        
+        // Use currentAccessToken instead of process.env.FB_ACCESS_TOKEN
         const response = await axios.get('https://graph.facebook.com/v18.0/oauth/access_token', {
             params: {
                 grant_type: 'fb_exchange_token',
                 client_id: process.env.App_ID,
                 client_secret: process.env.App_secret,
-                fb_exchange_token: currentToken
+                fb_exchange_token: currentAccessToken
             }
         });
 
         const newToken = response.data.access_token;
+        
+        // Update both the environment variable and the currentAccessToken
+        process.env.FB_ACCESS_TOKEN = newToken;
+        currentAccessToken = newToken;
         
         // Update the .env file
         const envPath = path.join(__dirname, '.env');
@@ -459,9 +462,6 @@ async function refreshLongLivedToken() {
             `FB_ACCESS_TOKEN=${newToken}`
         );
         await fs.promises.writeFile(envPath, updatedContent);
-
-        // Update the current environment variable
-        process.env.FB_ACCESS_TOKEN = newToken;
         
         console.log('Facebook token refreshed successfully');
     } catch (error) {
@@ -472,12 +472,16 @@ async function refreshLongLivedToken() {
 // Modify your server startup
 const startServer = async () => {
     try {
-        // Always refresh token on startup
+        // Ensure currentAccessToken is set before refresh attempt
+        currentAccessToken = process.env.FB_ACCESS_TOKEN;
+        console.log('Starting server with token:', currentAccessToken ? 'Token present' : 'No token');
+        
+        // Attempt to refresh token
         await refreshLongLivedToken();
         
-        // Your existing server startup code
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
+            console.log('Current access token:', currentAccessToken ? 'Token present' : 'No token');
         });
     } catch (error) {
         console.error('Server startup error:', error);

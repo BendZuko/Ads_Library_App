@@ -10,7 +10,14 @@ export const state = {
 
 // Import modular components
 import { initializeForm, handleFormSubmit } from './components/FormHandler.js';
-import { initializeDataTable, updateResults, loadAllVideos, downloadCSV, loadVideo } from './pages/ResultsPage.js';
+import { 
+    initializeDataTable, 
+    updateResults, 
+    loadAllVideos, 
+    downloadCSV, 
+    loadVideo,
+    addToPermaFilter
+} from './pages/ResultsPage.js';
 import { showToast, showSuccessToast, showErrorToast } from './components/Toast.js';
 import { 
     filterAd, 
@@ -27,6 +34,11 @@ import {
     saveCurrentSearch,
     deleteSavedSearch
 } from './components/SavedSearchesSidebar.js';
+import {
+    openPermFilteredView,
+    closePermFilteredView,
+    unPermFilterPage
+} from './components/PermFilteredModal.js';
 
 // Application Initialization
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,6 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.download-csv-btn')?.addEventListener('click', downloadCSV);
     document.querySelector('.filtered-view-btn')?.addEventListener('click', openFilteredView);
     document.querySelector('.view-saved-btn')?.addEventListener('click', toggleSavedSearches);
+
+    // Hide sidebar on initial load
+    const sidebar = document.querySelector('.saved-searches-sidebar');
+    if (sidebar) {
+        sidebar.classList.remove('visible');
+    }
 });
 
 // Export necessary functions for global usage
@@ -59,5 +77,9 @@ export {
     loadVideo,
     downloadCSV,
     openFilteredView,
-    closeFilteredView
+    closeFilteredView,
+    addToPermaFilter,
+    openPermFilteredView,
+    closePermFilteredView,
+    unPermFilterPage
 };

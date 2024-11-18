@@ -84,7 +84,8 @@
 .save-search-btn,
 .download-csv-btn,
 .view-saved-btn,
-.filtered-view-btn {
+.filtered-view-btn,
+.perm-filtered-view-btn {
     padding: 8px 16px;
     border-radius: 8px;
     border: none;
@@ -187,4 +188,26 @@
 .search-item .action-btn:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
+}
+
+.perm-filter-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.perm-filter-btn:hover {
+    background-color: #c82333;
+}
+
+.action-btn.perm-filter-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.action-btn.perm-filter-btn:hover {
+    background-color: #c82333;
 }

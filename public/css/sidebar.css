@@ -31,16 +31,21 @@
 /* Saved Searches Sidebar */
 .saved-searches-sidebar {
     position: fixed;
+    right: -400px;
     top: 0;
-    right: 0;
     width: 400px;
     height: 100vh;
     background: white;
-    box-shadow: var(--shadow-lg);
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+    transition: right 0.3s ease;
     z-index: 1000;
     overflow-y: auto;
+    visibility: hidden;
+}
+
+.saved-searches-sidebar.visible {
+    right: 0;
+    visibility: visible;
 }
 
 /* Update the header styles */
@@ -156,4 +161,48 @@
 .search-item .load-btn:active {
     transform: translateY(0);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.saved-search-item {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.saved-search-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.saved-search-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.saved-search-date {
+    font-size: 0.8em;
+    color: var(--text-secondary);
+}
+
+.saved-search-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.saved-search-actions button {
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.load-btn {
+    background: var(--primary-color);
+    color: white;
+}
+
+.delete-btn {
+    background: var(--danger-color);
+    color: white;
 }
