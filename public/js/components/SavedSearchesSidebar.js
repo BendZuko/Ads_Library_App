@@ -169,7 +169,10 @@ async function loadSavedSearch(searchId) {
                 if (!state.filteredAds.has(ad.id) && 
                     !state.filteredPages.has(ad.page_name) &&
                     !isPermFiltered) {
-                    state.adsTable.row.add(ad);
+                    state.adsTable.row.add({
+                        ...ad,
+                        search_timestamp: searchData.timestamp
+                    });
                 }
             });
 
@@ -188,6 +191,9 @@ async function loadSavedSearch(searchId) {
         if (searchNameDisplay) {
             searchNameDisplay.textContent = searchData.name;
         }
+
+        // Store the timestamp for the loaded search
+        localStorage.setItem('currentSearchTimestamp', searchData.timestamp);
     } catch (error) {
         console.error('Error loading saved search:', error);
         showErrorToast(`Failed to load search: ${error.message}`);

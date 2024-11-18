@@ -3,152 +3,108 @@
     background: white;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-lg);
-    overflow: hidden;
+    width: 100%;
 }
 
 #resultsTable {
     width: 100% !important;
-    table-layout: fixed;
-    border-collapse: separate;
-    border-spacing: 0;
+    margin: 0 !important;
+    border-collapse: collapse !important;
 }
 
 #resultsTable thead th {
-    background: var(--background-gray);
-    padding: 12px 16px;
-    font-weight: 600;
-    text-align: left;
-    border-bottom: 2px solid #e2e8f0;
-    white-space: nowrap;
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 10 !important;
+    background: var(--background-gray) !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    padding: 12px 8px !important;
+    white-space: nowrap !important;
+    text-align: center !important;
 }
 
-#resultsTable tbody td {
-    padding: 12px 16px;
-    border-bottom: 1px solid #e2e8f0;
-    vertical-align: middle;
+#resultsTable td {
+    padding: 12px 8px !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    border-bottom: 1px solid #e2e8f0 !important;
 }
 
-/* Column-specific widths */
 #resultsTable th:nth-child(1),
 #resultsTable td:nth-child(1) {
-    width: 10%;
-    white-space: nowrap;
-    text-align: center !important;
+    min-width: 100px !important;
+    width: 100px !important;
 }
 
 #resultsTable th:nth-child(2),
 #resultsTable td:nth-child(2) {
-    width: 15%;
-    white-space: nowrap;
-    text-align: center !important;
+    min-width: 100px !important;
+    width: 100px !important;
 }
 
 #resultsTable th:nth-child(3),
 #resultsTable td:nth-child(3) {
-    width: 12%;
-    text-align: right !important;
-    white-space: nowrap;
+    min-width: 180px !important;
+    width: 180px !important;
 }
 
 #resultsTable th:nth-child(4),
 #resultsTable td:nth-child(4) {
-    width: 38%;
-    text-align: center !important;
+    min-width: 120px !important;
+    width: 120px !important;
 }
 
 #resultsTable th:nth-child(5),
 #resultsTable td:nth-child(5) {
-    width: 25%;
-    min-width: 250px;
+    min-width: 150px !important;
+    width: 150px !important;
+}
+
+#resultsTable th:nth-child(6),
+#resultsTable td:nth-child(6) {
+    min-width: 250px !important;
+    width: 250px !important;
+}
+
+.dataTables_scrollBody {
+    border-bottom: 1px solid #e2e8f0 !important;
+    margin-top: -1px !important;
+}
+
+.dataTables_scrollHead {
+    overflow: hidden !important;
+    margin-bottom: -1px !important;
+}
+
+.dt-center {
     text-align: center !important;
-}
-
-.dataTables_wrapper {
-    padding: 0;
-    margin: 0;
-    overflow-x: auto;
-}
-
-.dataTables_scroll {
-    margin-bottom: 20px;
-}
-
-/* DataTables specific classes */
-.dt-center { 
-    text-align: center !important;
-}
-
-.dt-body-right {
-    text-align: right !important;
-    padding-right: 24px;
 }
 
 .dt-head-center {
     text-align: center !important;
 }
 
-/* Remove default DataTables buttons */
-.dt-buttons {
-    display: inline-flex !important;
-    margin-left: 16px !important;
+table.dataTable {
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    width: 100% !important;
 }
 
-/* Video column specific styles */
-.video-column {
-    min-width: 400px;
+.dataTables_scroll {
+    width: 100% !important;
+    overflow: hidden !important;
 }
 
-.video-container {
-    margin: 10px auto;
-    max-width: 500px;
-    padding: 10px;
+.dataTables_scrollBody {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    width: 100% !important;
 }
 
-.video-container video {
+.dataTables_wrapper {
     width: 100%;
-    max-width: 480px;
-    margin: 0 auto;
-    display: block;
-}
-
-.table-actions {
-    display: flex;
-    gap: 6px;
-    justify-content: center;
-    flex-wrap: nowrap;
-}
-
-.table-controls {
-    margin-bottom: 16px;
-    display: flex;
-    justify-content: flex-end;
-    padding: 0 16px;
-}
-
-/* Add these styles at the end of your existing table.css */
-
-.top.d-flex {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 15px 16px;
-    flex-wrap: nowrap !important;
-    width: 100%;
-}
-
-.left-controls {
-    display: flex !important;
-    align-items: center !important;
-    gap: 16px !important;
-}
-
-.right-controls {
-    display: flex !important;
-    align-items: center !important;
-    margin-left: auto !important;
+    margin: 0;
+    padding: 0;
 }
 
 .dataTables_length {
@@ -180,13 +136,11 @@
     -moz-appearance: menulist !important;
 }
 
-/* Remove any pseudo-elements that might be causing the overlay */
 .dataTables_length select::before,
 .dataTables_length select::after {
     display: none !important;
 }
 
-/* Hide the default info display since we're including it in the length menu */
 .dataTables_info {
     display: none !important;
 }
@@ -220,37 +174,31 @@
     background: #dc2626 !important;
 }
 
-/* Update the header cell containing the button */
 #resultsTable th:nth-child(4) {
     display: table-cell;  /* Reset to default table cell display */
 }
 
-/* Style for the button inside the header */
 #resultsTable .load-all-videos-btn {
     position: static;
     transform: none;
     margin: 0;
 }
 
-/* Make sure the video column header has relative positioning */
 #resultsTable th:nth-child(4) {
     position: static;
 }
 
-/* Clean up the length control */
 .dataTables_length {
     margin: 0 !important;
     white-space: nowrap !important;
 }
 
-/* Remove absolute positioning from load-all-videos-btn */
 #resultsTable .load-all-videos-btn {
     position: static;
     transform: none;
     margin: 0;
 }
 
-/* Clean up any floating issues */
 .dataTables_wrapper .dataTables_length,
 .dataTables_wrapper .dataTables_filter,
 .dataTables_wrapper .dataTables_info,
@@ -268,7 +216,6 @@
     padding-right: 16px;
 }
 
-/* Add these specific styles for the pagination container */
 .dataTables_wrapper .bottom {
     display: flex !important;
     justify-content: space-between !important;
@@ -277,14 +224,12 @@
     padding: 0 16px !important;
 }
 
-/* Style the length (entries per page) container */
 .dataTables_wrapper .dataTables_length {
     float: none !important;
     display: flex;
     align-items: center;
 }
 
-/* Style the pagination container */
 .dataTables_wrapper .dataTables_paginate {
     float: none !important;
     display: flex;
@@ -293,7 +238,6 @@
     padding-right: 0;
 }
 
-/* Update the bottom controls layout */
 .dataTables_wrapper .bottom {
     display: flex !important;
     justify-content: space-between !important;
@@ -302,14 +246,12 @@
     padding: 0 16px !important;
 }
 
-/* Style for both top and bottom left controls */
 .left-controls {
     display: flex !important;
     align-items: center !important;
     gap: 16px !important;
 }
 
-/* Style for the length selector and stats in both top and bottom */
 .dataTables_length {
     display: flex !important;
     align-items: center !important;
@@ -326,11 +268,71 @@
     white-space: nowrap !important;
 }
 
-/* Keep pagination on the right */
 .right-controls {
     margin-left: auto !important;
 }
 
 .dataTables_wrapper .dataTables_paginate {
     margin: 0 !important;
+}
+
+/* Update container styles to use full height */
+.results-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 150px) !important; /* Adjust based on your header/margins */
+}
+
+.view-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Important for Firefox */
+}
+
+/* Update DataTables wrapper to fill space */
+.dataTables_wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Important for Firefox */
+}
+
+/* Update scroll container to fill available space */
+.dataTables_scroll {
+    flex: 1;
+    min-height: 0; /* Important for Firefox */
+}
+
+.dataTables_scrollBody {
+    max-height: none !important; /* Remove max height restriction */
+    height: 100% !important;
+}
+
+/* Remove fixed height from DataTable initialization */
+
+/* Fix button positioning */
+.dataTables_wrapper .dt-buttons {
+    float: right !important;
+    margin-left: auto !important;
+}
+
+/* Ensure proper layout of the top controls */
+.dataTables_wrapper .top {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 0 16px !important;
+}
+
+.left-controls {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+}
+
+.right-controls {
+    margin-left: auto !important;
 }

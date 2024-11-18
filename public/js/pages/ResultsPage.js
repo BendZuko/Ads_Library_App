@@ -14,9 +14,18 @@ export function initializeDataTable() {
             data: [],
             columns: [
                 { 
+                    data: 'search_timestamp',
+                    title: 'Search Date',
+                    width: '100px',
+                    className: 'dt-center all',
+                    render: function(data) {
+                        return data ? new Date(data).toLocaleDateString() : '';
+                    }
+                },
+                { 
                     data: 'ad_creation_time',
                     title: 'Creation Date',
-                    width: '15%',
+                    width: '100px',
                     className: 'dt-center all',
                     render: function(data) {
                         return data ? new Date(data).toLocaleDateString() : '';
@@ -25,13 +34,13 @@ export function initializeDataTable() {
                 { 
                     data: 'page_name',
                     title: 'Page Name',
-                    width: '20%',
+                    width: '180px',
                     className: 'dt-center all'
                 },
                 { 
                     data: 'eu_total_reach',
                     title: 'EU Total Reach',
-                    width: '15%',
+                    width: '120px',
                     className: 'dt-body-right dt-head-center all',
                     render: function(data) {
                         return data ? data.toLocaleString() : '0';
@@ -40,13 +49,13 @@ export function initializeDataTable() {
                 {
                     data: 'ad_snapshot_url',
                     title: 'Video',
-                    width: '25%',
+                    width: '150px',
                     className: 'dt-center video-column all',
                     render: function(data, type, row) {
                         if (!data) return '';
                         return `
                             <button class="action-btn video-btn" onclick="loadVideo('${data}', this)">
-                                <i class="fas fa-video"></i> Load Video
+                                <i class="fas fa-video"></i> Load
                             </button>
                             <div class="video-container" style="display:none;"></div>`;
                     }
@@ -54,22 +63,22 @@ export function initializeDataTable() {
                 { 
                     data: null,
                     title: 'Actions',
-                    width: '25%',
+                    width: '250px',
                     className: 'dt-center all',
                     render: function(data, type, row) {
                         return `
                             <div class="table-actions">
-                                <a href="${row.ad_snapshot_url}" target="_blank" class="action-btn view-btn">
-                                    <i class="fas fa-external-link-alt"></i> View
-                                </a>
+                                <button onclick="window.open('${row.ad_snapshot_url}', '_blank')" class="action-btn view-btn">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </button>
                                 <button onclick="filterAd('${row.id}')" class="action-btn filter-btn">
-                                    <i class="fas fa-filter"></i> Filter
+                                    <i class="fas fa-filter"></i>
                                 </button>
                                 <button onclick="filterPage('${row.page_name}')" class="action-btn filter-page-btn">
-                                    <i class="fas fa-filter"></i> Filter Page
+                                    <i class="fas fa-filter"></i> Page
                                 </button>
                                 <button onclick="addToPermaFilter('${row.page_name}')" class="action-btn perm-filter-btn">
-                                    <i class="fas fa-ban"></i> Perm Filter
+                                    <i class="fas fa-ban"></i> Perm Filter Page
                                 </button>
                             </div>`;
                     }
@@ -84,6 +93,9 @@ export function initializeDataTable() {
             responsive: true,
             autoWidth: false,
             scrollX: true,
+            scrollY: true,
+            scrollCollapse: false,
+            fixedHeader: true,
             dom: '<"top d-flex justify-content-between"<"left-controls"<"dataTables_length"l><"total-entries">><"right-controls"B>><"clear">rt<"bottom d-flex justify-content-between"<"left-controls"<"dataTables_length"l><"total-entries-bottom">><"right-controls"p>>',
             buttons: [
                 {
@@ -110,6 +122,9 @@ export function initializeDataTable() {
                 lengthMenu: '_MENU_ per page',
                 info: 'Showing _START_ to _END_ of _TOTAL_ entries',
                 infoFiltered: '(filtered from _MAX_ total entries)'
+            },
+            responsive: {
+                details: false
             }
         });
         
@@ -327,7 +342,11 @@ export async function updateResults(ads) {
         console.log('Adding rows to table');
         state.adsTable.clear();
         
+        // Get the current search timestamp from localStorage
+        const searchTimestamp = localStorage.getItem('currentSearchTimestamp');
+        
         const transformedData = visibleAds.map(ad => ({
+            search_timestamp: searchTimestamp,
             ad_creation_time: ad.ad_creation_time,
             page_name: ad.page_name,
             eu_total_reach: ad.eu_total_reach,
