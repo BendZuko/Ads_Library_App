@@ -67,6 +67,14 @@ function toggleSavedSearches() {
         return;
     }
 
+    const closeButton = sidebar.querySelector('.close-btn');
+    if (closeButton) {
+        closeButton.addEventListener('click', () => {
+            state.savedSearchesSidebarVisible = false;
+            sidebar.classList.remove('visible');
+        });
+    }
+
     state.savedSearchesSidebarVisible = !state.savedSearchesSidebarVisible;
     
     if (state.savedSearchesSidebarVisible) {
