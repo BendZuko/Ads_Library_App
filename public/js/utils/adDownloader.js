@@ -1,7 +1,6 @@
 import { showToast } from '../components/Toast.js';
 
 export async function downloadAd(adUrl) {
-    // Find the download button in the table
     const downloadButton = document.querySelector(`button[onclick="downloadAd('${adUrl}')"]`);
     const originalButtonContent = downloadButton ? downloadButton.innerHTML : null;
 
@@ -12,9 +11,9 @@ export async function downloadAd(adUrl) {
             downloadButton.classList.add('loading');
         }
         
-        showToast('Fetching video URL...', 'info');
+        showToast('Fetching media URL...', 'info');
 
-        // Step 1: Get the video URL
+        // Step 1: Get the media URL
         const extractResponse = await fetch('/extract', {
             method: 'POST',
             headers: {
@@ -24,7 +23,7 @@ export async function downloadAd(adUrl) {
         });
 
         if (!extractResponse.ok) {
-            throw new Error('Failed to extract video URL');
+            throw new Error('Failed to extract media URL');
         }
 
         const data = await extractResponse.json();
@@ -34,37 +33,53 @@ export async function downloadAd(adUrl) {
             throw new Error(data.error);
         }
 
-        // Get the highest quality URL available
-        const videoUrl = data.hdUrl || data.sdUrl;
-        
-        if (!videoUrl) {
-            throw new Error('No video URL found');
+        // Handle both video and image cases
+        if (data.imageUrl) {
+            // Handle image download
+            showToast('Starting image download...', 'info');
+            
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const filename = `fb_ad_image_${timestamp}.jpg`;
+            
+            // Use proxy-download for images too
+            const link = document.createElement('a');
+            link.href = `/proxy-download?url=${encodeURIComponent(data.imageUrl)}&filename=${encodeURIComponent(filename)}`;
+            link.download = filename;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast('Image download started!', 'success');
+        } else {
+            // Existing video download logic
+            const videoUrl = data.hdUrl || data.sdUrl;
+            
+            if (!videoUrl) {
+                throw new Error('No media URL found');
+            }
+
+            showToast('Starting video download...', 'info');
+
+            const quality = data.hdUrl ? 'HD' : 'SD';
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const filename = `fb_ad_${quality}_${timestamp}.mp4`;
+
+            const link = document.createElement('a');
+            link.href = `/proxy-download?url=${encodeURIComponent(videoUrl)}&filename=${encodeURIComponent(filename)}`;
+            link.download = filename;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast('Download started!', 'success');
         }
-
-        showToast('Starting download...', 'info');
-
-        // Step 2: Download through proxy
-        const quality = data.hdUrl ? 'HD' : 'SD';
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const filename = `fb_ad_${quality}_${timestamp}.mp4`;
-
-        // Create a link element
-        const link = document.createElement('a');
-        link.href = `/proxy-download?url=${encodeURIComponent(videoUrl)}&filename=${encodeURIComponent(filename)}`;
-        link.download = filename;
-        
-        // Append, click, and remove
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        showToast('Download started!', 'success');
 
     } catch (error) {
         console.error('Download error:', error);
         showToast(`Download failed: ${error.message}`, 'error');
     } finally {
-        // Reset button state
         if (downloadButton) {
             downloadButton.innerHTML = originalButtonContent;
             downloadButton.disabled = false;

@@ -186,129 +186,35 @@ app.post('/api/fetch-video', async (req, res) => {
         
         const page = await browser.newPage();
         await page.setDefaultNavigationTimeout(70000);
-        await page.setRequestInterception(true);
         
-        let mediaUrl = null;
-        let mediaType = null;
-        let mediaRequests = [];
-        
-        // Enhanced request monitoring
-        page.on('request', request => {
-            const url = request.url();
-            if (url.includes('fbcdn.net')) {
-                // Track video requests
-                if (url.includes('.mp4') || url.includes('/video/')) {
-                    mediaRequests.push({ url, type: 'video', quality: 'high' });
-                }
-                // Track image requests with quality indicators
-                else if (/\.(jpg|jpeg|png)/.test(url)) {
-                    let quality = 'low';
-                    if (url.includes('s600x600') || url.includes('s1080x1080')) quality = 'high';
-                    else if (url.includes('s350x350')) quality = 'medium';
-                    mediaRequests.push({ url, type: 'image', quality });
-                }
-            }
-            request.continue();
-        });
-
         console.log(`Navigating to ${url}`);
         await page.goto(url, { 
             waitUntil: 'networkidle0',
             timeout: 30000
         });
 
-        // First try: Check network requests for high-quality media
-        if (mediaRequests.length > 0) {
-            // First look for high-quality video
-            const videoRequest = mediaRequests.find(r => r.type === 'video' && r.quality === 'high');
-            if (videoRequest) {
-                mediaUrl = videoRequest.url;
-                mediaType = 'video';
-            } else {
-                // Then look for high-quality image
-                const imageRequests = mediaRequests
-                    .filter(r => r.type === 'image')
-                    .sort((a, b) => {
-                        // Sort by quality and URL length (longer URLs often indicate higher quality)
-                        if (a.quality !== b.quality) {
-                            return a.quality === 'high' ? -1 : 1;
-                        }
-                        return b.url.length - a.url.length;
-                    });
-
-                if (imageRequests.length > 0) {
-                    mediaUrl = imageRequests[0].url;
-                    mediaType = 'image';
-                }
+        // First try to find video
+        let mediaUrl = await page.evaluate(() => {
+            const video = document.querySelector('video');
+            if (video && video.src) {
+                return { url: video.src, type: 'video' };
             }
-        }
-
-        // Second try: Enhanced DOM search
-        if (!mediaUrl) {
-            mediaUrl = await page.evaluate(() => {
-                // Helper function to get complete URL with query parameters
-                const getCompleteUrl = (element) => {
-                    const dataSrc = element.getAttribute('data-src');
-                    const src = element.src;
-                    return (dataSrc?.length || 0) > (src?.length || 0) ? dataSrc : src;
-                };
-
-                // Helper function to check image quality from URL
-                const getImageQuality = (url) => {
-                    if (url.includes('s600x600') || url.includes('s1080x1080')) return 3;
-                    if (url.includes('s350x350')) return 2;
-                    if (url.includes('s60x60')) return 0;
-                    return 1;
-                };
-
-                // Try to find video first
-                const videoSources = [
-                    document.querySelector('video[src]')?.src,
-                    document.querySelector('video[data-video-source]')?.getAttribute('data-video-source'),
-                    document.querySelector('source[src]')?.src,
-                    document.querySelector('video source[src]')?.src,
-                    document.querySelector('[data-video-url]')?.getAttribute('data-video-url')
-                ].filter(Boolean);
-
-                const videoUrl = videoSources.find(src => src && src.includes('fbcdn.net'));
-                if (videoUrl) {
-                    return { url: videoUrl, type: 'video' };
-                }
-
-                // Try to find the main ad image
-                const imgElements = Array.from(document.querySelectorAll('img[src*="fbcdn.net"], img[src*="scontent"]'));
-                const validImages = imgElements
-                    .map(img => ({
-                        element: img,
-                        url: getCompleteUrl(img),
-                        rect: img.getBoundingClientRect()
-                    }))
-                    .filter(({ rect, url }) => {
-                        // Filter out small images and ensure URL exists
-                        return url && rect.width > 100 && rect.height > 100;
-                    })
-                    .map(img => ({
-                        ...img,
-                        quality: getImageQuality(img.url),
-                        area: img.rect.width * img.rect.height
-                    }))
-                    .sort((a, b) => {
-                        // Sort by quality first, then by area
-                        if (a.quality !== b.quality) return b.quality - a.quality;
-                        return b.area - a.area;
-                    });
-
-                if (validImages.length > 0) {
-                    return { url: validImages[0].url, type: 'image' };
-                }
-
-                return null;
-            });
-
-            if (mediaUrl) {
-                ({ url: mediaUrl, type: mediaType } = mediaUrl);
+            
+            // If no video, look for the main ad image
+            // This selector targets the main ad image specifically
+            const adImage = document.querySelector('img.xz62fqu.xh8yej3.x9ybwvh.x19kjcj4');
+            if (adImage && adImage.src) {
+                return { url: adImage.src, type: 'image' };
             }
-        }
+
+            // Fallback to looking for any image in the ad container
+            const adContainer = document.querySelector('div.x1ywc1zp.x78zum5.xl56j7k.x1e56ztr.x1277o0a img');
+            if (adContainer && adContainer.src) {
+                return { url: adContainer.src, type: 'image' };
+            }
+
+            return null;
+        });
 
         await browser.close();
 
@@ -316,17 +222,17 @@ app.post('/api/fetch-video', async (req, res) => {
             return res.status(404).json({ error: 'No media URL found' });
         }
 
-        // Ensure URL is absolute and preserve query parameters
-        if (!mediaUrl.startsWith('http')) {
-            mediaUrl = new URL(mediaUrl, url).href;
+        // Ensure URL is absolute
+        if (!mediaUrl.url.startsWith('http')) {
+            mediaUrl.url = new URL(mediaUrl.url, url).href;
         }
 
-        console.log(`Found ${mediaType} URL:`, mediaUrl);
+        console.log(`Found ${mediaUrl.type} URL:`, mediaUrl.url);
 
         // Return appropriate response based on media type
-        const response = mediaType === 'video' 
-            ? { videoUrl: mediaUrl }
-            : { imageUrl: mediaUrl };
+        const response = mediaUrl.type === 'video' 
+            ? { videoUrl: mediaUrl.url }
+            : { imageUrl: mediaUrl.url };
 
         res.json(response);
 
@@ -581,7 +487,7 @@ app.post('/extract', async (req, res) => {
 
     try {
         const { url } = req.body;
-        logMessage('INFO', 'Starting video extraction', { url });
+        logMessage('INFO', 'Starting media extraction', { url });
 
         const browser = await puppeteer.launch({
             headless: "new",
@@ -603,7 +509,7 @@ app.post('/extract', async (req, res) => {
         
         await page.setRequestInterception(true);
         
-        // Set up network listeners
+        // Set up network listeners for video
         page.on('request', request => {
             const url = request.url();
             if (isVideoUrl(url)) {
@@ -626,126 +532,118 @@ app.post('/extract', async (req, res) => {
         await page.setViewport({ width: 1280, height: 800 });
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
 
-        // Navigate to page and wait for video element
+        // Navigate to page and wait for content to load
         await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
         
-        // Wait for video element to be present
-        await page.waitForSelector('video', { timeout: 5000 });
+        // Check if there's a video element (without waiting)
+        const hasVideo = await page.$('video');
         
-        // Get initial video source
-        const initialSrc = await page.evaluate(() => {
-            const video = document.querySelector('video');
-            return video ? video.src : null;
-        });
+        if (hasVideo) {
+            // Video handling logic
+            await page.waitForSelector('video', { timeout: 5000 });
+            
+            // Get initial video source
+            const initialSrc = await page.evaluate(() => {
+                const video = document.querySelector('video');
+                return video ? video.src : null;
+            });
 
-        // Set up MutationObserver for video source changes
-        await page.evaluate(() => {
-            window.videoSourceChanged = false;
-            const video = document.querySelector('video');
-            if (video) {
-                const observer = new MutationObserver((mutations) => {
-                    mutations.forEach((mutation) => {
-                        if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
-                            window.videoSourceChanged = true;
-                        }
+            // Set up MutationObserver for video source changes
+            await page.evaluate(() => {
+                window.videoSourceChanged = false;
+                const video = document.querySelector('video');
+                if (video) {
+                    const observer = new MutationObserver((mutations) => {
+                        mutations.forEach((mutation) => {
+                            if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
+                                window.videoSourceChanged = true;
+                            }
+                        });
                     });
-                });
-                
-                observer.observe(video, { attributes: true });
-            }
-        });
-
-        // Click play button and wait for video to start
-        await page.evaluate(async () => {
-            const wait = (ms) => new Promise(r => setTimeout(r, ms));
-            
-            // Helper function to click elements
-            const clickElement = async (selector) => {
-                const element = document.querySelector(selector);
-                if (element) {
-                    element.click();
-                    await wait(1000);
-                    return true;
+                    observer.observe(video, { attributes: true });
                 }
-                return false;
-            };
+            });
 
-            // Try different play button selectors
-            await clickElement('div[aria-label="Play Video"]') ||
-            await clickElement('[data-testid="video_player_play_button"]') ||
-            await clickElement('.play_button');
-        });
+            // Try to click play button and access quality settings
+            await page.evaluate(async () => {
+                const wait = (ms) => new Promise(r => setTimeout(r, ms));
+                const clickElement = async (selector) => {
+                    const element = document.querySelector(selector);
+                    if (element) {
+                        element.click();
+                        await wait(1000);
+                        return true;
+                    }
+                    return false;
+                };
 
-        // Wait for video playback to start
-        await new Promise(resolve => setTimeout(resolve, 2000));
+                await clickElement('div[aria-label="Play Video"]') ||
+                await clickElement('[data-testid="video_player_play_button"]') ||
+                await clickElement('.play_button');
 
-        // Try to access quality settings
-        const result = await page.evaluate(async () => {
-            const wait = (ms) => new Promise(r => setTimeout(r, ms));
-            
-            try {
-                // Click settings button
+                // Try to access quality settings
                 const settingsButton = document.querySelector('div[aria-label="Settings"]');
                 if (settingsButton) {
                     settingsButton.click();
                     await wait(1000);
-                }
 
-                // Look for quality menu
-                const qualityButtons = Array.from(document.querySelectorAll('div[role="button"]'))
-                    .filter(el => el.textContent.toLowerCase().includes('quality'));
-                
-                if (qualityButtons.length > 0) {
-                    qualityButtons[0].click();
-                    await wait(1000);
-
-                    // Look for HD option
-                    const hdOption = Array.from(document.querySelectorAll('div[role="button"]'))
-                        .find(el => el.textContent.toLowerCase().includes('hd'));
+                    const qualityButtons = Array.from(document.querySelectorAll('div[role="button"]'))
+                        .filter(el => el.textContent.toLowerCase().includes('quality'));
                     
-                    if (hdOption) {
-                        hdOption.click();
+                    if (qualityButtons.length > 0) {
+                        qualityButtons[0].click();
                         await wait(1000);
+
+                        const hdOption = Array.from(document.querySelectorAll('div[role="button"]'))
+                            .find(el => el.textContent.toLowerCase().includes('hd'));
+                        
+                        if (hdOption) {
+                            hdOption.click();
+                            await wait(1000);
+                        }
                     }
                 }
+            });
 
-                const video = document.querySelector('video');
-                return {
-                    success: true,
-                    finalSrc: video?.src || null
-                };
-            } catch (error) {
-                return { success: false, error: error.message };
+            // Wait for any new video URLs
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
+            const urls = Array.from(videoUrls);
+            const hdUrl = urls.find(url => url.includes('_n.?') || url.includes('high'));
+            const sdUrl = urls.find(url => url.includes('.mp4'));
+
+            logMessage('SUCCESS', 'Video extraction completed', { hdUrl, sdUrl });
+            await browser.close();
+            
+            res.json({
+                sdUrl,
+                hdUrl,
+                allUrls: urls,
+                logs
+            });
+        } else {
+            // Image handling logic
+            const imageUrl = await page.evaluate(() => {
+                const adImage = document.querySelector('img.xz62fqu.xh8yej3.x9ybwvh.x19kjcj4');
+                if (adImage && adImage.src) {
+                    return adImage.src;
+                }
+                
+                const adContainer = document.querySelector('div.x1ywc1zp.x78zum5.xl56j7k.x1e56ztr.x1277o0a img');
+                return adContainer ? adContainer.src : null;
+            });
+
+            if (imageUrl) {
+                logMessage('SUCCESS', 'Image URL found', { imageUrl });
+                await browser.close();
+                res.json({
+                    imageUrl,
+                    logs
+                });
+            } else {
+                throw new Error('No media content found');
             }
-        });
-
-        // Wait for any new video URLs to be captured
-        await new Promise(resolve => setTimeout(resolve, 3000));
-
-        const urls = Array.from(videoUrls);
-        
-        // Look for HD URL first
-        const hdUrl = urls.find(url => url.includes('_n.?') || url.includes('high'));
-        const sdUrl = urls.find(url => url.includes('.mp4'));
-
-        const finalResult = {
-            sdUrl,
-            hdUrl,
-            allUrls: urls,
-            debugInfo: {
-                urlCount: urls.length,
-                result,
-                initialSrc
-            }
-        };
-
-        logMessage('SUCCESS', 'Video extraction completed', finalResult);
-        await browser.close();
-        
-        res.json({
-            ...finalResult,
-            logs
-        });
+        }
 
     } catch (error) {
         logMessage('ERROR', 'Error occurred during extraction', {
@@ -753,7 +651,7 @@ app.post('/extract', async (req, res) => {
             stack: error.stack
         });
         res.status(500).json({ 
-            error: 'Could not fetch video URL. ' + error.message,
+            error: 'Could not fetch media URL. ' + error.message,
             stack: error.stack,
             logs
         });
@@ -778,9 +676,10 @@ app.get('/proxy-download', async (req, res) => {
             }
         });
 
-        // Set headers for file download
-        res.setHeader('Content-Type', 'video/mp4');
-        res.setHeader('Content-Disposition', `attachment; filename="${filename || 'video.mp4'}"`);
+        // Set appropriate Content-Type based on filename
+        const isVideo = filename.toLowerCase().endsWith('.mp4');
+        res.setHeader('Content-Type', isVideo ? 'video/mp4' : 'image/jpeg');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 
         // Pipe the video stream to response
         response.data.pipe(res);
