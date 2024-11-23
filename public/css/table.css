@@ -533,3 +533,138 @@ table.dataTable {
         width: 100%;
     }
 }
+
+.small-filter-btn {
+    padding: 4px 8px;
+    min-width: auto;
+}
+
+.action-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.table-actions {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+}
+
+.video-btn.loading,
+.download-btn.loading {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+/* Update the filter button styles */
+.filter-btn {
+    padding: 6px !important;  /* Reduce padding */
+    min-width: auto !important;  /* Remove minimum width */
+    width: 32px !important;  /* Set fixed width */
+    height: 32px !important;  /* Set fixed height */
+}
+
+.filter-btn i {
+    margin: 0 !important;  /* Remove icon margin */
+}
+
+/* Ensure consistent column widths */
+#resultsTable th,
+#resultsTable td {
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+/* Define exact widths for each column */
+#resultsTable th:nth-child(1),
+#resultsTable td:nth-child(1),
+.dataTables_scrollHead table th:nth-child(1) {
+    width: 100px !important;
+    min-width: 100px !important;
+    max-width: 100px !important;
+}
+
+#resultsTable th:nth-child(2),
+#resultsTable td:nth-child(2),
+.dataTables_scrollHead table th:nth-child(2) {
+    width: 100px !important;
+    min-width: 100px !important;
+    max-width: 100px !important;
+}
+
+#resultsTable th:nth-child(3),
+#resultsTable td:nth-child(3),
+.dataTables_scrollHead table th:nth-child(3) {
+    width: 180px !important;
+    min-width: 180px !important;
+    max-width: 180px !important;
+}
+
+#resultsTable th:nth-child(4),
+#resultsTable td:nth-child(4),
+.dataTables_scrollHead table th:nth-child(4) {
+    width: 200px !important;
+    min-width: 200px !important;
+    max-width: 200px !important;
+}
+
+#resultsTable th:nth-child(5),
+#resultsTable td:nth-child(5),
+.dataTables_scrollHead table th:nth-child(5) {
+    width: 150px !important;
+    min-width: 150px !important;
+    max-width: 150px !important;
+}
+
+#resultsTable th:nth-child(6),
+#resultsTable td:nth-child(6),
+.dataTables_scrollHead table th:nth-child(6) {
+    width: 250px !important;
+    min-width: 250px !important;
+    max-width: 250px !important;
+}
+
+#resultsTable th:nth-child(7),
+#resultsTable td:nth-child(7),
+.dataTables_scrollHead table th:nth-child(7) {
+    width: 150px !important;
+    min-width: 150px !important;
+    max-width: 150px !important;
+}
+
+#resultsTable th:nth-child(8),
+#resultsTable td:nth-child(8),
+.dataTables_scrollHead table th:nth-child(8) {
+    width: 150px !important;
+    min-width: 150px !important;
+    max-width: 150px !important;
+}
+
+/* Update scroll container styles */
+.dataTables_scrollHead,
+.dataTables_scrollBody {
+    width: 100% !important;
+}
+
+.dataTables_scrollBody {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+}
+
+/* Ensure tables use same layout */
+.dataTables_scrollHead table,
+.dataTables_scrollBody table {
+    table-layout: fixed !important;
+    margin: 0 !important;
+    border-collapse: collapse !important;
+    width: 100% !important;
+}
+
+/* Remove any conflicting width calculations */
+.dataTables_wrapper {
+    width: 100% !important;
+    overflow: hidden !important;
+}

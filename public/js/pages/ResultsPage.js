@@ -106,7 +106,7 @@ export function initializeDataTable() {
                     render: function(data, type, row) {
                         return `
                             <div class="table-actions">
-                                <button onclick="filterAd('${row.id}')" class="action-btn filter-btn">
+                                <button onclick="filterAd('${row.id}')" class="action-btn filter-btn" title="Filter Ad">
                                     <i class="fas fa-filter"></i>
                                 </button>
                                 <button onclick="filterPage('${row.page_name}')" class="action-btn filter-page-btn">
@@ -169,7 +169,7 @@ export function initializeDataTable() {
                                 <button onclick="window.open('${row.ad_snapshot_url}', '_blank')" class="action-btn view-btn">
                                     <i class="fas fa-external-link-alt"></i> Visit URL
                                 </button>
-                                <button onclick="downloadAd('${row.ad_snapshot_url}')" class="action-btn download-btn">
+                                <button onclick="downloadAd('${row.ad_snapshot_url}')" class="action-btn download-btn" id="download-${row.id}">
                                     <i class="fas fa-download"></i> Download
                                 </button>
                             </div>`;
@@ -465,6 +465,14 @@ export async function loadAllVideos() {
         if (currentVideoRequest) {
             currentVideoRequest.abort();
         }
+        
+        // Reset all loading buttons
+        const loadingButtons = document.querySelectorAll('.video-btn.loading');
+        loadingButtons.forEach(button => {
+            button.innerHTML = '<i class="fas fa-video"></i> Load';
+            button.classList.remove('loading');
+        });
+        
         loadButton.innerHTML = '<i class="fas fa-play-circle"></i> Load All Media';
         loadButton.classList.remove('loading');
         showWarningToast('Media loading stopped');
@@ -490,9 +498,18 @@ export async function loadAllVideos() {
             if (!isLoadingVideos) break;
 
             try {
+                // Show loading state for current button
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                button.classList.add('loading');
+
                 const onClickAttr = button.getAttribute('onclick');
                 const urlMatch = onClickAttr.match(/loadVideo\('([^']+)'/);
-                if (!urlMatch) continue;
+                if (!urlMatch) {
+                    button.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
+                    button.classList.remove('loading');
+                    button.classList.add('error');
+                    continue;
+                }
 
                 const videoUrl = urlMatch[1];
 
@@ -557,11 +574,19 @@ export async function loadAllVideos() {
                     });
                 }
 
+                // Update success state
+                button.classList.remove('loading');
+                button.style.display = 'none';
+                button.classList.add('loaded');
+                loadedCount++;
+                loadButton.innerHTML = `<i class="fas fa-stop-circle"></i> Stop Loading (${loadedCount}/${totalVideos})`;
+
             } catch (error) {
                 if (!isLoadingVideos) break;
                 console.error('Error loading media:', error);
                 failedVideos.push(button);
                 button.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
+                button.classList.remove('loading');
                 button.classList.add('error');
             }
         }

@@ -246,3 +246,13 @@
     white-space: nowrap;
     min-width: 100px;
 }
+
+.compact-btn {
+    padding: 6px 8px;
+    min-width: auto;
+}
+
+.video-btn.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}

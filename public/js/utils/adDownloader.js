@@ -1,7 +1,17 @@
 import { showToast } from '../components/Toast.js';
 
 export async function downloadAd(adUrl) {
+    // Find the download button in the table
+    const downloadButton = document.querySelector(`button[onclick="downloadAd('${adUrl}')"]`);
+    const originalButtonContent = downloadButton ? downloadButton.innerHTML : null;
+
     try {
+        if (downloadButton) {
+            downloadButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Downloading...';
+            downloadButton.disabled = true;
+            downloadButton.classList.add('loading');
+        }
+        
         showToast('Fetching video URL...', 'info');
 
         // Step 1: Get the video URL
@@ -53,6 +63,13 @@ export async function downloadAd(adUrl) {
     } catch (error) {
         console.error('Download error:', error);
         showToast(`Download failed: ${error.message}`, 'error');
+    } finally {
+        // Reset button state
+        if (downloadButton) {
+            downloadButton.innerHTML = originalButtonContent;
+            downloadButton.disabled = false;
+            downloadButton.classList.remove('loading');
+        }
     }
 }
 
