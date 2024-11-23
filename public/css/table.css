@@ -461,3 +461,75 @@ table.dataTable {
 .view-stats:hover {
     text-decoration: underline;
 }
+
+.table-filters {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.filter-group label {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+}
+
+.filter-input {
+    padding: 6px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 14px;
+    min-width: 120px;
+}
+
+.filter-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+}
+
+.clear-filters-btn {
+    background: #f3f4f6;
+    border: 1px solid #e2e8f0;
+    padding: 6px 12px;
+    border-radius: 4px;
+    color: #666;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: fit-content;
+    margin-top: auto;
+    transition: all 0.2s ease;
+}
+
+.clear-filters-btn:hover {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+/* Make filters responsive */
+@media (max-width: 768px) {
+    .table-filters {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .filter-group {
+        width: 100%;
+    }
+
+    .filter-input {
+        width: 100%;
+    }
+}

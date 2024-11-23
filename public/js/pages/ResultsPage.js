@@ -14,6 +14,33 @@ const statsChart = new StatsChart();
 export function initializeDataTable() {
     console.log('Initializing DataTable');
     
+    // Check if filter bar already exists before adding
+    if (!$('.table-filters').length) {
+        $('#resultsTable').before(`
+            <div class="table-filters">
+                <div class="filter-group">
+                    <label for="dateFilter">Creation Date From</label>
+                    <input type="date" id="dateFilter" class="filter-input">
+                </div>
+                <div class="filter-group">
+                    <label for="pageNameFilter">Page Name</label>
+                    <input type="text" id="pageNameFilter" class="filter-input" placeholder="Search pages...">
+                </div>
+                <div class="filter-group">
+                    <label for="reachFilter">Min. Total Reach</label>
+                    <input type="number" id="reachFilter" class="filter-input" placeholder="Minimum reach...">
+                </div>
+                <div class="filter-group">
+                    <label for="statsFilter">Min. 7-Day Change %</label>
+                    <input type="number" id="statsFilter" class="filter-input" placeholder="Min. change %">
+                </div>
+                <button class="clear-filters-btn">
+                    <i class="fas fa-times"></i> Clear Filters
+                </button>
+            </div>
+        `);
+    }
+
     if (!state.adsTable) {
         const table = $('#resultsTable').DataTable({
             data: [],
@@ -183,6 +210,82 @@ export function initializeDataTable() {
             }
         });
         
+        // Add custom filtering functionality
+        $.fn.dataTable.ext.search.push(
+            function(settings, data, dataIndex) {
+                // Get filter values
+                const dateFilter = $('#dateFilter').val();
+                const pageNameFilter = $('#pageNameFilter').val().toLowerCase();
+                const reachFilter = $('#reachFilter').val();
+                const statsFilter = $('#statsFilter').val();
+
+                // Get row data
+                const creationDate = data[1] ? new Date(data[1]) : null;
+                const pageName = (data[2] || '').toLowerCase();
+                
+                // Get reach value directly from data
+                let reach = 0;
+                try {
+                    reach = parseInt(data[3]) || 0;
+                    
+                    // Fallback to parsing from text if direct parse fails
+                    if (reach === 0 && data[3]) {
+                        const reachText = data[3].toString();
+                        const reachMatch = reachText.match(/\d+/);
+                        reach = reachMatch ? parseInt(reachMatch[0]) : 0;
+                    }
+                } catch (error) {
+                    console.error('Error parsing reach:', error);
+                    reach = 0;
+                }
+
+                // Apply filters
+                if (dateFilter && creationDate && creationDate < new Date(dateFilter)) return false;
+                if (pageNameFilter && !pageName.includes(pageNameFilter)) return false;
+                
+                // Reach filter
+                if (reachFilter !== '' && !isNaN(reachFilter)) {
+                    const filterValue = parseInt(reachFilter);
+                    if (isNaN(reach) || reach < filterValue) return false;
+                }
+
+                // Stats filter
+                if (statsFilter !== '' && !isNaN(statsFilter)) {
+                    try {
+                        const statsText = data[6] || '';
+                        const statsMatch = statsText.match(/-?\d+\.?\d*/);
+                        let statsValue = statsMatch ? parseFloat(statsMatch[0]) : 0;
+                        
+                        if (statsText.includes('decrease')) {
+                            statsValue = -statsValue;
+                        }
+                        
+                        if (statsValue < parseFloat(statsFilter)) return false;
+                    } catch (error) {
+                        console.error('Error parsing stats:', error);
+                    }
+                }
+
+                return true;
+            }
+        );
+
+        // Monitor filter changes
+        $('#reachFilter, #statsFilter').on('input', function() {
+            console.log(`${this.id} changed to:`, $(this).val());
+        });
+
+        // Add filter change handlers
+        $('.filter-input').on('input', function() {
+            table.draw();
+        });
+
+        // Add clear filters handler
+        $('.clear-filters-btn').on('click', function() {
+            $('.filter-input').val('');
+            table.draw();
+        });
+
         // Add this draw event handler
         table.on('draw', async function() {
             try {
@@ -704,9 +807,16 @@ $('#resultsTable').on('click', '.stats-cell', function() {
     statsChart.showStats(rowData.id);
 });
 
-// Helper function to calculate reach change
-function calculateReachChange(adId) {
-    // Your existing logic to calculate 7-day change
-    // Return the percentage change
-    // This should match your current implementation
+// Helper function to calculate reach change percentage
+function calculateReachChange(rowData) {
+    if (!rowData.reachHistory || rowData.reachHistory.length < 8) {
+        return null;
+    }
+    
+    const currentReach = rowData.reachHistory[0];
+    const previousReach = rowData.reachHistory[7];
+    
+    if (previousReach === 0) return 0;
+    
+    return ((currentReach - previousReach) / previousReach) * 100;
 }

@@ -11,7 +11,8 @@ require('dotenv').config();
 const app = express();
 
 // Configure server middleware
-app.use(express.json());
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.use(cors());
 
 // Add middleware for proper MIME types
@@ -73,17 +74,22 @@ app.post('/api/fetch-ads', async (req, res) => {
             throw new Error('Access token not available');
         }
 
-        // Construct the Facebook API URL
+        let allAds = [];
+        let nextPageUrl = null;
+        const maxAds = 100000; // Set maximum number of ads to fetch
+        
+        // Construct the initial Facebook API URL
         const baseUrl = 'https://graph.facebook.com/v18.0/ads_archive';
         const queryParams = new URLSearchParams({
             access_token: currentAccessToken,
             search_terms: search_terms || 'all',
             ad_active_status: ad_active_status || 'ALL',
             ad_delivery_date_min: ad_delivery_date_min || '',
-            ad_reached_countries: ad_reached_countries || '',
+            ad_reached_countries: ad_reached_countries ? `["${ad_reached_countries}"]` : '',
             ad_type: 'ALL',
             fields: fields || 'ad_creation_time,page_name,ad_snapshot_url,eu_total_reach',
-            limit: '1000'  // Adjust as needed
+            languages: ad_language ? `["${ad_language}"]` : '',
+            limit: '25000'
         });
 
         // Remove empty parameters
@@ -91,36 +97,46 @@ app.post('/api/fetch-ads', async (req, res) => {
             if (!value) queryParams.delete(key);
         });
 
-        const apiUrl = `${baseUrl}?${queryParams.toString()}`;
-        console.log('Fetching from URL:', apiUrl);
-
-        const response = await axios.get(apiUrl, {
-            timeout: 30000, // 30 second timeout
-            validateStatus: status => status < 500 // Only reject if status >= 500
-        });
-
-        // Check for API errors
-        if (response.data.error) {
-            console.error('Facebook API Error:', response.data.error);
-            return res.status(400).json({
-                error: {
-                    message: response.data.error.message || 'Facebook API Error'
-                }
+        let currentUrl = `${baseUrl}?${queryParams.toString()}`;
+        
+        while (currentUrl && allAds.length < maxAds) {
+            console.log(`Fetching ads (current total: ${allAds.length})`);
+            
+            const response = await axios.get(currentUrl, {
+                timeout: 30000,
+                validateStatus: status => status < 500
             });
+
+            if (response.data.error) {
+                console.error('Facebook API Error:', response.data.error);
+                throw new Error(response.data.error.message || 'Facebook API Error');
+            }
+
+            const timestamp = new Date().toISOString();
+            const enrichedData = response.data.data.map(ad => ({
+                ...ad,
+                search_timestamp: timestamp,
+                id: ad.id || crypto.randomUUID()
+            }));
+
+            allAds = allAds.concat(enrichedData);
+
+            // Check if there's a next page
+            nextPageUrl = response.data.paging?.next;
+            if (!nextPageUrl) break;
+
+            currentUrl = nextPageUrl;
+
+            // Optional: Add a small delay between requests to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
-        // Add timestamp to each result
-        const timestamp = new Date().toISOString();
-        const enrichedData = response.data.data.map(ad => ({
-            ...ad,
-            search_timestamp: timestamp,
-            id: ad.id || crypto.randomUUID()
-        }));
+        console.log(`Total ads fetched: ${allAds.length}`);
 
-        // Send the response
         res.json({
-            data: enrichedData,
-            paging: response.data.paging
+            data: allAds,
+            total: allAds.length,
+            hasMore: !!nextPageUrl
         });
 
     } catch (error) {
@@ -170,7 +186,7 @@ app.post('/api/fetch-video', async (req, res) => {
         const page = await browser.newPage();
         
         // Set a reasonable timeout
-        await page.setDefaultNavigationTimeout(30000);
+        await page.setDefaultNavigationTimeout(70000);
         
         // Enable request interception to capture video URLs
         await page.setRequestInterception(true);

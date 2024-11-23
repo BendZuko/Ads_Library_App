@@ -57,11 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sidebar) {
         sidebar.classList.remove('visible');
     }
-
-    document.getElementById('searchForm').addEventListener('submit', () => {
-        clearCurrentSearchName();
-        handleFormSubmit();
-    });
 });
 
 // Export necessary functions for global usage

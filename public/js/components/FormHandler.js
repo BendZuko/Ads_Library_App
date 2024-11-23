@@ -45,7 +45,16 @@ const LANGUAGE_MAPPING = {
 
 export function initializeForm() {
     const form = document.getElementById('searchForm');
-    form.addEventListener('submit', handleFormSubmit);
+    
+    // Remove any existing event listeners
+    form.removeEventListener('submit', handleFormSubmit);
+    
+    // Add new event listener with explicit prevention of default behavior
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();  // Prevent form from submitting normally
+        await handleFormSubmit();
+    });
+    
     loadSavedParameters();
 }
 
@@ -89,11 +98,17 @@ export function storeFetchTimestamp() {
 }
 
 export async function handleFormSubmit(event) {
-    if (event) event.preventDefault();
+    // Remove the event parameter check since we're handling it in the listener
     showLoading();
 
     try {
-        // Store fetch timestamp at the start of the fetch
+        // Update loading message to show progress
+        const loadingMessage = document.createElement('div');
+        loadingMessage.id = 'loadingMessage';
+        loadingMessage.style.textAlign = 'center';
+        loadingMessage.style.marginTop = '10px';
+        document.getElementById('loadingOverlay').appendChild(loadingMessage);
+
         storeFetchTimestamp();
 
         const formData = {
@@ -123,21 +138,21 @@ export async function handleFormSubmit(event) {
             throw new Error(data.error.message || 'Failed to fetch ads');
         }
 
-        console.log('Received ads data:', data);
+        console.log(`Successfully fetched ${data.data.length} ads`);
         
-        if (!data.data || !Array.isArray(data.data)) {
-            throw new Error('Invalid data format received from server');
-        }
-
         state.currentAdsData = data.data;
         updateResults(state.currentAdsData);
         
-        showSuccessToast(`Successfully fetched ${data.data.length} ads`);
+        showSuccessToast(`Successfully fetched ${data.data.length} ads${data.hasMore ? ' (more available)' : ''}`);
     } catch (error) {
         showErrorToast(error.message);
         console.error('Error fetching ads:', error);
     } finally {
         hideLoading();
+        const loadingMessage = document.getElementById('loadingMessage');
+        if (loadingMessage) {
+            loadingMessage.remove();
+        }
     }
 }
 
