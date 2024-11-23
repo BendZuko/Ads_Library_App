@@ -2,6 +2,7 @@ import { state } from '../app.js';
 import { showErrorToast, showSuccessToast, showWarningToast, showToast } from '../components/Toast.js';
 import { updateTableStats } from '../components/FilteredModal.js';
 import { StatsChart } from '../components/StatsModal.js';
+import { downloadAd } from '../utils/adDownloader.js';
 
 let isLoadingVideos = false;
 let loadingInterval = null;
@@ -98,16 +99,13 @@ export function initializeDataTable() {
                 },
                 { 
                     data: null,
-                    title: 'Actions',
-                    width: '250px',
+                    title: 'Filter',
+                    width: '200px',
                     className: 'dt-center all',
                     orderable: false,
                     render: function(data, type, row) {
                         return `
                             <div class="table-actions">
-                                <button onclick="window.open('${row.ad_snapshot_url}', '_blank')" class="action-btn view-btn">
-                                    <i class="fas fa-external-link-alt"></i>
-                                </button>
                                 <button onclick="filterAd('${row.id}')" class="action-btn filter-btn">
                                     <i class="fas fa-filter"></i>
                                 </button>
@@ -157,6 +155,24 @@ export function initializeDataTable() {
                                 </div>`;
                         }
                         return '';
+                    }
+                },
+                { 
+                    data: null,
+                    title: 'Actions',
+                    width: '150px',
+                    className: 'dt-center all',
+                    orderable: false,
+                    render: function(data, type, row) {
+                        return `
+                            <div class="table-actions">
+                                <button onclick="window.open('${row.ad_snapshot_url}', '_blank')" class="action-btn view-btn">
+                                    <i class="fas fa-external-link-alt"></i> Visit URL
+                                </button>
+                                <button onclick="downloadAd('${row.ad_snapshot_url}')" class="action-btn download-btn">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>`;
                     }
                 }
             ],
@@ -823,3 +839,6 @@ function calculateReachChange(rowData) {
     
     return ((currentReach - previousReach) / previousReach) * 100;
 }
+
+// Make downloadAd available globally
+window.downloadAd = downloadAd;

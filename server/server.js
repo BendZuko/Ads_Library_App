@@ -13,7 +13,11 @@ const app = express();
 // Configure server middleware
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
-app.use(cors());
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Add middleware for proper MIME types
 app.use((req, res, next) => {
@@ -22,9 +26,6 @@ app.use((req, res, next) => {
     }
     next();
 });
-
-// Serve static files
-app.use('/', express.static(path.join(__dirname, '../public')));
 
 // Debug middleware
 app.use((req, res, next) => {
@@ -550,7 +551,250 @@ app.get('/api/current-token', (req, res) => {
     res.json({ token: currentAccessToken });
 });
 
-// Add a catch-all route for SPA
+// First, add all API routes
+app.post('/extract', async (req, res) => {
+    const logs = [];
+    const logMessage = (type, message, details = null) => {
+        let sanitizedDetails = null;
+        if (details) {
+            try {
+                if (type === 'SUCCESS') {
+                    const { logs, ...otherDetails } = details;
+                    sanitizedDetails = otherDetails;
+                } else {
+                    sanitizedDetails = JSON.parse(JSON.stringify(details));
+                }
+            } catch (e) {
+                sanitizedDetails = String(details);
+            }
+        }
+
+        const logEntry = {
+            timestamp: new Date().toISOString(),
+            type,
+            message,
+            details: sanitizedDetails
+        };
+        logs.push(logEntry);
+        console.log(`[${type}] ${message}`, sanitizedDetails || '');
+    };
+
+    try {
+        const { url } = req.body;
+        logMessage('INFO', 'Starting video extraction', { url });
+
+        const browser = await puppeteer.launch({
+            headless: "new",
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+
+        const page = await browser.newPage();
+        page.on('console', msg => {
+            logMessage('BROWSER', msg.text());
+        });
+        
+        const videoUrls = new Set();
+        let lastVideoUrl = null;
+
+        const isVideoUrl = (url) => {
+            return url.includes('/t42.1790-2/') &&
+                   (url.includes('.mp4') || url.includes('_n.?'));
+        };
+        
+        await page.setRequestInterception(true);
+        
+        // Set up network listeners
+        page.on('request', request => {
+            const url = request.url();
+            if (isVideoUrl(url)) {
+                logMessage('VIDEO_REQUEST', 'Video URL intercepted', { url });
+                videoUrls.add(url);
+                lastVideoUrl = url;
+            }
+            request.continue();
+        });
+        
+        page.on('response', async response => {
+            const url = response.url();
+            if (isVideoUrl(url)) {
+                logMessage('VIDEO_RESPONSE', 'Video response received', { url });
+                videoUrls.add(url);
+                lastVideoUrl = url;
+            }
+        });
+
+        await page.setViewport({ width: 1280, height: 800 });
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+
+        // Navigate to page and wait for video element
+        await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
+        
+        // Wait for video element to be present
+        await page.waitForSelector('video', { timeout: 5000 });
+        
+        // Get initial video source
+        const initialSrc = await page.evaluate(() => {
+            const video = document.querySelector('video');
+            return video ? video.src : null;
+        });
+
+        // Set up MutationObserver for video source changes
+        await page.evaluate(() => {
+            window.videoSourceChanged = false;
+            const video = document.querySelector('video');
+            if (video) {
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
+                            window.videoSourceChanged = true;
+                        }
+                    });
+                });
+                
+                observer.observe(video, { attributes: true });
+            }
+        });
+
+        // Click play button and wait for video to start
+        await page.evaluate(async () => {
+            const wait = (ms) => new Promise(r => setTimeout(r, ms));
+            
+            // Helper function to click elements
+            const clickElement = async (selector) => {
+                const element = document.querySelector(selector);
+                if (element) {
+                    element.click();
+                    await wait(1000);
+                    return true;
+                }
+                return false;
+            };
+
+            // Try different play button selectors
+            await clickElement('div[aria-label="Play Video"]') ||
+            await clickElement('[data-testid="video_player_play_button"]') ||
+            await clickElement('.play_button');
+        });
+
+        // Wait for video playback to start
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Try to access quality settings
+        const result = await page.evaluate(async () => {
+            const wait = (ms) => new Promise(r => setTimeout(r, ms));
+            
+            try {
+                // Click settings button
+                const settingsButton = document.querySelector('div[aria-label="Settings"]');
+                if (settingsButton) {
+                    settingsButton.click();
+                    await wait(1000);
+                }
+
+                // Look for quality menu
+                const qualityButtons = Array.from(document.querySelectorAll('div[role="button"]'))
+                    .filter(el => el.textContent.toLowerCase().includes('quality'));
+                
+                if (qualityButtons.length > 0) {
+                    qualityButtons[0].click();
+                    await wait(1000);
+
+                    // Look for HD option
+                    const hdOption = Array.from(document.querySelectorAll('div[role="button"]'))
+                        .find(el => el.textContent.toLowerCase().includes('hd'));
+                    
+                    if (hdOption) {
+                        hdOption.click();
+                        await wait(1000);
+                    }
+                }
+
+                const video = document.querySelector('video');
+                return {
+                    success: true,
+                    finalSrc: video?.src || null
+                };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        });
+
+        // Wait for any new video URLs to be captured
+        await new Promise(resolve => setTimeout(resolve, 3000));
+
+        const urls = Array.from(videoUrls);
+        
+        // Look for HD URL first
+        const hdUrl = urls.find(url => url.includes('_n.?') || url.includes('high'));
+        const sdUrl = urls.find(url => url.includes('.mp4'));
+
+        const finalResult = {
+            sdUrl,
+            hdUrl,
+            allUrls: urls,
+            debugInfo: {
+                urlCount: urls.length,
+                result,
+                initialSrc
+            }
+        };
+
+        logMessage('SUCCESS', 'Video extraction completed', finalResult);
+        await browser.close();
+        
+        res.json({
+            ...finalResult,
+            logs
+        });
+
+    } catch (error) {
+        logMessage('ERROR', 'Error occurred during extraction', {
+            message: error.message,
+            stack: error.stack
+        });
+        res.status(500).json({ 
+            error: 'Could not fetch video URL. ' + error.message,
+            stack: error.stack,
+            logs
+        });
+    }
+});
+
+// Then add other API routes...
+app.get('/proxy-download', async (req, res) => {
+    try {
+        const { url, filename } = req.query;
+        
+        if (!url) {
+            return res.status(400).json({ error: 'URL is required' });
+        }
+
+        const response = await axios({
+            method: 'GET',
+            url: decodeURIComponent(url),
+            responseType: 'stream',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+        });
+
+        // Set headers for file download
+        res.setHeader('Content-Type', 'video/mp4');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename || 'video.mp4'}"`);
+
+        // Pipe the video stream to response
+        response.data.pipe(res);
+
+    } catch (error) {
+        console.error('Download error:', error);
+        res.status(500).json({ error: 'Failed to download video' });
+    }
+});
+
+// AFTER all API routes, add the static file middleware
+app.use(express.static(path.join(__dirname, '../public')));
+
+// Finally, add the catch-all route for the SPA
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
