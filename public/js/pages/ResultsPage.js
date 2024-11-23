@@ -387,7 +387,7 @@ export function initializeDataTable() {
 
 export async function loadVideo(videoUrl, buttonElement) {
     try {
-        // Check if video is already loaded
+        // Check if media is already loaded
         if (buttonElement.classList.contains('loaded')) {
             return true;
         }
@@ -404,22 +404,27 @@ export async function loadVideo(videoUrl, buttonElement) {
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to fetch video: ${response.statusText}`);
+            throw new Error(`Failed to fetch media: ${response.statusText}`);
         }
 
         const data = await response.json();
         
-        if (!data.videoUrl) {
-            throw new Error('No video URL returned');
-        }
-
         const videoContainer = buttonElement.nextElementSibling;
         videoContainer.style.display = 'block';
-        videoContainer.innerHTML = `
-            <video controls style="width: 100%; max-height: 200px;">
-                <source src="${data.videoUrl}" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>`;
+
+        // Check if we received a video URL or image URL
+        if (data.videoUrl) {
+            videoContainer.innerHTML = `
+                <video controls style="width: 100%; max-height: 200px;">
+                    <source src="${data.videoUrl}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>`;
+        } else if (data.imageUrl) {
+            videoContainer.innerHTML = `
+                <img src="${data.imageUrl}" alt="Ad Image" style="width: 100%; max-height: 200px; object-fit: contain;">`;
+        } else {
+            throw new Error('No media URL returned');
+        }
         
         buttonElement.style.display = 'none';
         buttonElement.setAttribute('data-loaded', 'true');
@@ -427,11 +432,11 @@ export async function loadVideo(videoUrl, buttonElement) {
         return true;
 
     } catch (error) {
-        console.error('Error loading video:', error);
+        console.error('Error loading media:', error);
         buttonElement.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
         buttonElement.classList.add('error');
         buttonElement.disabled = false;
-        showErrorToast(`Failed to load video: ${error.message}`);
+        showErrorToast(`Failed to load media: ${error.message}`);
         return false;
     }
 }
@@ -440,20 +445,19 @@ export async function loadAllVideos() {
     const loadButton = document.querySelector('.load-all-videos-btn');
     
     if (isLoadingVideos) {
-        // Immediate stop
         isLoadingVideos = false;
         if (currentVideoRequest) {
-            currentVideoRequest.abort(); // Abort the current fetch request
+            currentVideoRequest.abort();
         }
-        loadButton.innerHTML = '<i class="fas fa-play-circle"></i> Load All Videos';
+        loadButton.innerHTML = '<i class="fas fa-play-circle"></i> Load All Media';
         loadButton.classList.remove('loading');
-        showWarningToast('Video loading stopped');
+        showWarningToast('Media loading stopped');
         return;
     }
 
     const videoButtons = Array.from(document.querySelectorAll('.video-btn:not(.loaded):not(.error)'));
     if (!videoButtons.length) {
-        showWarningToast('No new videos to load');
+        showWarningToast('No new media to load');
         return;
     }
 
@@ -476,7 +480,6 @@ export async function loadAllVideos() {
 
                 const videoUrl = urlMatch[1];
 
-                // Create AbortController for this request
                 const controller = new AbortController();
                 currentVideoRequest = controller;
 
@@ -487,7 +490,7 @@ export async function loadAllVideos() {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({ url: videoUrl }),
-                        signal: controller.signal // Add abort signal to fetch
+                        signal: controller.signal
                     });
 
                     if (!response.ok) {
@@ -496,17 +499,22 @@ export async function loadAllVideos() {
 
                     const data = await response.json();
                     
-                    if (!data.videoUrl) {
-                        throw new Error('No video URL returned');
-                    }
-
                     const videoContainer = button.nextElementSibling;
                     videoContainer.style.display = 'block';
-                    videoContainer.innerHTML = `
-                        <video controls style="width: 100%; max-height: 200px;">
-                            <source src="${data.videoUrl}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>`;
+
+                    // Handle both video and image responses
+                    if (data.videoUrl) {
+                        videoContainer.innerHTML = `
+                            <video controls style="width: 100%; max-height: 200px;">
+                                <source src="${data.videoUrl}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>`;
+                    } else if (data.imageUrl) {
+                        videoContainer.innerHTML = `
+                            <img src="${data.imageUrl}" alt="Ad Image" style="width: 100%; max-height: 200px; object-fit: contain;">`;
+                    } else {
+                        throw new Error('No media URL returned');
+                    }
                     
                     button.style.display = 'none';
                     button.classList.add('loaded');
@@ -516,19 +524,16 @@ export async function loadAllVideos() {
                 } catch (error) {
                     if (error.name === 'AbortError') {
                         console.log('Fetch aborted');
-                        break; // Exit the loop on abort
+                        break;
                     }
-                    throw error; // Re-throw other errors
+                    throw error;
                 }
 
-                // Clear the current request reference
                 currentVideoRequest = null;
 
-                // Add delay between videos
                 if (isLoadingVideos && loadedCount < totalVideos) {
                     await new Promise((resolve, reject) => {
                         const timeoutId = setTimeout(resolve, 200 + Math.random() * 1000);
-                        // Allow the delay to be cancelled
                         if (!isLoadingVideos) {
                             clearTimeout(timeoutId);
                             reject(new Error('Loading stopped'));
@@ -537,25 +542,23 @@ export async function loadAllVideos() {
                 }
 
             } catch (error) {
-                if (!isLoadingVideos) break; // Exit if loading was stopped
-                console.error('Error loading video:', error);
+                if (!isLoadingVideos) break;
+                console.error('Error loading media:', error);
                 failedVideos.push(button);
                 button.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
                 button.classList.add('error');
             }
         }
     } finally {
-        // Cleanup
         isLoadingVideos = false;
         currentVideoRequest = null;
-        loadButton.innerHTML = '<i class="fas fa-play-circle"></i> Load All Videos';
+        loadButton.innerHTML = '<i class="fas fa-play-circle"></i> Load All Media';
         loadButton.classList.remove('loading');
 
-        // Show final status
         if (loadedCount > 0) {
-            showSuccessToast(`Successfully loaded ${loadedCount} videos${failedVideos.length > 0 ? `, ${failedVideos.length} failed` : ''}`);
+            showSuccessToast(`Successfully loaded ${loadedCount} media items${failedVideos.length > 0 ? `, ${failedVideos.length} failed` : ''}`);
         } else if (failedVideos.length > 0) {
-            showErrorToast(`Failed to load ${failedVideos.length} videos`);
+            showErrorToast(`Failed to load ${failedVideos.length} media items`);
         }
     }
 }

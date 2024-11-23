@@ -184,19 +184,28 @@ app.post('/api/fetch-video', async (req, res) => {
         });
         
         const page = await browser.newPage();
-        
-        // Set a reasonable timeout
         await page.setDefaultNavigationTimeout(70000);
-        
-        // Enable request interception to capture video URLs
         await page.setRequestInterception(true);
         
-        let videoUrl = null;
+        let mediaUrl = null;
+        let mediaType = null;
+        let mediaRequests = [];
         
+        // Enhanced request monitoring
         page.on('request', request => {
             const url = request.url();
-            if (url.includes('.mp4') || url.includes('video')) {
-                videoUrl = url;
+            if (url.includes('fbcdn.net')) {
+                // Track video requests
+                if (url.includes('.mp4') || url.includes('/video/')) {
+                    mediaRequests.push({ url, type: 'video', quality: 'high' });
+                }
+                // Track image requests with quality indicators
+                else if (/\.(jpg|jpeg|png)/.test(url)) {
+                    let quality = 'low';
+                    if (url.includes('s600x600') || url.includes('s1080x1080')) quality = 'high';
+                    else if (url.includes('s350x350')) quality = 'medium';
+                    mediaRequests.push({ url, type: 'image', quality });
+                }
             }
             request.continue();
         });
@@ -207,25 +216,123 @@ app.post('/api/fetch-video', async (req, res) => {
             timeout: 30000
         });
 
-        // If we didn't catch the video URL through requests, try to find it in the DOM
-        if (!videoUrl) {
-            videoUrl = await page.evaluate(() => {
-                const video = document.querySelector('video');
-                return video ? video.src : null;
+        // First try: Check network requests for high-quality media
+        if (mediaRequests.length > 0) {
+            // First look for high-quality video
+            const videoRequest = mediaRequests.find(r => r.type === 'video' && r.quality === 'high');
+            if (videoRequest) {
+                mediaUrl = videoRequest.url;
+                mediaType = 'video';
+            } else {
+                // Then look for high-quality image
+                const imageRequests = mediaRequests
+                    .filter(r => r.type === 'image')
+                    .sort((a, b) => {
+                        // Sort by quality and URL length (longer URLs often indicate higher quality)
+                        if (a.quality !== b.quality) {
+                            return a.quality === 'high' ? -1 : 1;
+                        }
+                        return b.url.length - a.url.length;
+                    });
+
+                if (imageRequests.length > 0) {
+                    mediaUrl = imageRequests[0].url;
+                    mediaType = 'image';
+                }
+            }
+        }
+
+        // Second try: Enhanced DOM search
+        if (!mediaUrl) {
+            mediaUrl = await page.evaluate(() => {
+                // Helper function to get complete URL with query parameters
+                const getCompleteUrl = (element) => {
+                    const dataSrc = element.getAttribute('data-src');
+                    const src = element.src;
+                    return (dataSrc?.length || 0) > (src?.length || 0) ? dataSrc : src;
+                };
+
+                // Helper function to check image quality from URL
+                const getImageQuality = (url) => {
+                    if (url.includes('s600x600') || url.includes('s1080x1080')) return 3;
+                    if (url.includes('s350x350')) return 2;
+                    if (url.includes('s60x60')) return 0;
+                    return 1;
+                };
+
+                // Try to find video first
+                const videoSources = [
+                    document.querySelector('video[src]')?.src,
+                    document.querySelector('video[data-video-source]')?.getAttribute('data-video-source'),
+                    document.querySelector('source[src]')?.src,
+                    document.querySelector('video source[src]')?.src,
+                    document.querySelector('[data-video-url]')?.getAttribute('data-video-url')
+                ].filter(Boolean);
+
+                const videoUrl = videoSources.find(src => src && src.includes('fbcdn.net'));
+                if (videoUrl) {
+                    return { url: videoUrl, type: 'video' };
+                }
+
+                // Try to find the main ad image
+                const imgElements = Array.from(document.querySelectorAll('img[src*="fbcdn.net"], img[src*="scontent"]'));
+                const validImages = imgElements
+                    .map(img => ({
+                        element: img,
+                        url: getCompleteUrl(img),
+                        rect: img.getBoundingClientRect()
+                    }))
+                    .filter(({ rect, url }) => {
+                        // Filter out small images and ensure URL exists
+                        return url && rect.width > 100 && rect.height > 100;
+                    })
+                    .map(img => ({
+                        ...img,
+                        quality: getImageQuality(img.url),
+                        area: img.rect.width * img.rect.height
+                    }))
+                    .sort((a, b) => {
+                        // Sort by quality first, then by area
+                        if (a.quality !== b.quality) return b.quality - a.quality;
+                        return b.area - a.area;
+                    });
+
+                if (validImages.length > 0) {
+                    return { url: validImages[0].url, type: 'image' };
+                }
+
+                return null;
             });
+
+            if (mediaUrl) {
+                ({ url: mediaUrl, type: mediaType } = mediaUrl);
+            }
         }
 
         await browser.close();
 
-        if (!videoUrl) {
-            return res.status(404).json({ error: 'No video URL found' });
+        if (!mediaUrl) {
+            return res.status(404).json({ error: 'No media URL found' });
         }
 
-        res.json({ videoUrl });
+        // Ensure URL is absolute and preserve query parameters
+        if (!mediaUrl.startsWith('http')) {
+            mediaUrl = new URL(mediaUrl, url).href;
+        }
+
+        console.log(`Found ${mediaType} URL:`, mediaUrl);
+
+        // Return appropriate response based on media type
+        const response = mediaType === 'video' 
+            ? { videoUrl: mediaUrl }
+            : { imageUrl: mediaUrl };
+
+        res.json(response);
+
     } catch (error) {
-        console.error('Error fetching video:', error);
+        console.error('Error fetching media:', error);
         res.status(500).json({ 
-            error: 'Failed to fetch video URL',
+            error: 'Failed to fetch media URL',
             details: error.message 
         });
     }
