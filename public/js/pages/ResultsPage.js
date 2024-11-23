@@ -615,7 +615,6 @@ export async function updateResults(ads) {
     resultsContainer.style.display = 'block';
 
     if (state.adsTable) {
-        console.log('Destroying existing table');
         state.adsTable.destroy();
         state.adsTable = null;
     }
@@ -630,17 +629,14 @@ export async function updateResults(ads) {
 
         // Filter out ads that should be hidden
         const visibleAds = ads.filter(ad => {
-            // Hide if the ad's page is permanently filtered
             if (permanentlyFiltered.includes(ad.page_name)) {
                 console.log(`Filtering out ad from ${ad.page_name} (permanently filtered)`);
                 return false;
             }
-            // Hide if the ad is filtered
             if (state.filteredAds.has(ad.id)) {
                 console.log(`Filtering out ad ${ad.id} (filtered)`);
                 return false;
             }
-            // Hide if the ad's page is filtered
             if (state.filteredPages.has(ad.page_name)) {
                 state.filteredAds.add(ad.id);
                 console.log(`Filtering out ad from ${ad.page_name} (page filtered)`);
@@ -651,13 +647,12 @@ export async function updateResults(ads) {
 
         console.log('Visible ads after filtering:', visibleAds);
 
-        // Initialize table with filtered data
-        state.adsTable = initializeDataTable();
+        // Use the safe initialization method
+        state.adsTable = safeInitializeDataTable();
         
         console.log('Adding rows to table');
         state.adsTable.clear();
         
-        // Get the fetch timestamp
         const fetchTimestamp = localStorage.getItem('currentFetchTimestamp');
         
         const transformedData = visibleAds.map(ad => ({
@@ -684,8 +679,8 @@ export async function updateResults(ads) {
         console.error('Error applying filters:', error);
         showToast('Error applying filters', 'error');
         
-        // If there's an error, show the unfiltered results
-        state.adsTable = initializeDataTable();
+        // If there's an error, show the unfiltered results using safe initialization
+        state.adsTable = safeInitializeDataTable();
         state.adsTable.clear();
         state.adsTable.rows.add(ads).draw();
     }
@@ -756,15 +751,29 @@ export async function addToPermaFilter(pageName) {
             throw new Error('Failed to add to permanent filter');
         }
 
-        showToast(`Added "${pageName}" to permanent filter`, 'success');
-        
-        // Refresh the results with current data
-        await updateResults(state.currentAdsData);
+        // Instead of refreshing the entire table, just remove matching rows
+        const table = state.adsTable;
+        if (table) {
+            // Find and remove all rows matching the page name
+            table.rows((idx, data) => data.page_name === pageName)
+                .remove()
+                .draw(false); // false prevents full redraw
+        }
+
+        showSuccessToast(`Added "${pageName}" to permanent filter`);
 
     } catch (error) {
         console.error('Error adding to permanent filter:', error);
-        showToast('Failed to add to permanent filter', 'error');
+        showErrorToast('Failed to add to permanent filter');
     }
+}
+
+// Add this helper function to safely reinitialize the table if needed
+export function safeInitializeDataTable() {
+    if ($.fn.DataTable.isDataTable('#resultsTable')) {
+        $('#resultsTable').DataTable().destroy();
+    }
+    return initializeDataTable();
 }
 
 // Modify the displayResults function to filter out permanently filtered pages
