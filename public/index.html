@@ -158,7 +158,7 @@
                     </div>
                 </div>
                 <div id="tableView" class="view-section">
-                    <table id="resultsTable" class="display nowrap">
+                    <table id="resultsTable" class="display nowrap" style="width:100%">
                         <thead>
                             <tr>
                                 <th class="dt-head-center">Search Date</th>
@@ -171,7 +171,9 @@
                                 <th class="dt-head-center">Actions</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody>
+                            <!-- Data will be added dynamically -->
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -265,7 +267,7 @@
     <script type="module">
         import { 
             handleFormSubmit, 
-            updateResults, 
+            updateResults,
             showSuccessToast, 
             showErrorToast,
             filterAd,
@@ -276,54 +278,54 @@
             loadSavedSearch,
             saveCurrentSearch,
             deleteSavedSearch,
-            loadAllVideos,
             loadVideo,
+            loadAllVideos,
             downloadCSV,
             openFilteredView,
             closeFilteredView,
-            addToPermaFilter,
             openPermFilteredView,
             closePermFilteredView,
             unPermFilterPage
-        } from './js/app.js';
+        } from '/js/app.js';
 
-        import { updateAccessTokens } from './js/components/FormHandler.js';
+        import { updateAccessTokens } from '/js/components/FormHandler.js';
 
-        // Make functions available globally
-        window.handleFormSubmit = handleFormSubmit;
-        window.updateResults = updateResults;
-        window.showSuccessToast = showSuccessToast;
-        window.showErrorToast = showErrorToast;
-        window.filterAd = filterAd;
-        window.filterPage = filterPage;
-        window.unfilterAd = unfilterAd;
-        window.unfilterPage = unfilterPage;
-        window.toggleSavedSearches = toggleSavedSearches;
-        window.loadSavedSearch = loadSavedSearch;
-        window.saveCurrentSearch = saveCurrentSearch;
-        window.deleteSavedSearch = deleteSavedSearch;
-        window.loadAllVideos = loadAllVideos;
-        window.loadVideo = loadVideo;
-        window.downloadCSV = downloadCSV;
-        window.openFilteredView = openFilteredView;
-        window.closeFilteredView = closeFilteredView;
-        window.updateAccessTokens = updateAccessTokens;
-        window.addToPermaFilter = addToPermaFilter;
-        window.openPermFilteredView = openPermFilteredView;
-        window.closePermFilteredView = closePermFilteredView;
-        window.unPermFilterPage = unPermFilterPage;
+    // Make functions available globally
+    window.handleFormSubmit = handleFormSubmit;
+    window.updateResults = updateResults;
+    window.showSuccessToast = showSuccessToast;
+    window.showErrorToast = showErrorToast;
+    window.filterAd = filterAd;
+    window.filterPage = filterPage;
+    window.unfilterAd = unfilterAd;
+    window.unfilterPage = unfilterPage;
+    window.toggleSavedSearches = toggleSavedSearches;
+    window.loadSavedSearch = loadSavedSearch;
+    window.saveCurrentSearch = saveCurrentSearch;
+    window.deleteSavedSearch = deleteSavedSearch;
+    window.loadVideo = loadVideo;
+    window.loadAllVideos = loadAllVideos;
+    window.downloadCSV = downloadCSV;
+    window.openFilteredView = openFilteredView;
+    window.closeFilteredView = closeFilteredView;
+    window.updateAccessTokens = updateAccessTokens;
+    window.openPermFilteredView = openPermFilteredView;
+    window.closePermFilteredView = closePermFilteredView;
+    window.unPermFilterPage = unPermFilterPage;
+    window.filterAd = filterAd;
+    window.filterPage = filterPage;
 
-        // Add all event listeners after DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('searchForm').addEventListener('submit', handleFormSubmit);
-            document.querySelector('.update-token-btn').addEventListener('click', updateAccessTokens);
-            document.querySelector('.save-search-btn').addEventListener('click', saveCurrentSearch);
-            document.querySelector('.download-csv-btn').addEventListener('click', downloadCSV);
-            document.querySelector('.filtered-view-btn').addEventListener('click', openFilteredView);
-            document.querySelector('.view-saved-btn').addEventListener('click', toggleSavedSearches);
-            document.querySelector('.load-all-videos-btn').addEventListener('click', loadAllVideos);
-            document.querySelector('.perm-filtered-view-btn').addEventListener('click', openPermFilteredView);
-        });
-    </script>
+     // Add all event listeners after DOM is loaded
+     document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('searchForm').addEventListener('submit', handleFormSubmit);
+        document.querySelector('.update-token-btn')?.addEventListener('click', updateAccessTokens);
+        document.querySelector('.save-search-btn')?.addEventListener('click', saveCurrentSearch);
+        document.querySelector('.download-csv-btn')?.addEventListener('click', downloadCSV);
+        document.querySelector('.filtered-view-btn')?.addEventListener('click', openFilteredView);
+        document.querySelector('.view-saved-btn')?.addEventListener('click', toggleSavedSearches);
+        document.querySelector('.load-all-videos-btn')?.addEventListener('click', loadAllVideos);
+        document.querySelector('.perm-filtered-view-btn')?.addEventListener('click', openPermFilteredView);
+    });
+</script>
 </body>
 </html>

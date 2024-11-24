@@ -1,6 +1,6 @@
 import { state } from '../app.js';
 import { showErrorToast, showSuccessToast } from './Toast.js';
-import { updateResults } from '../pages/ResultsPage.js';
+import { updateResults } from '../pages/ResultsPage/ResultsPage.js';
 
 const COUNTRY_MAPPING = {
     'US': 'United States',

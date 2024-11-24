@@ -19,44 +19,77 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Add middleware for proper MIME types
-app.use((req, res, next) => {
-    if (req.url.endsWith('.js')) {
-        res.setHeader('Content-Type', 'application/javascript');
-    }
-    next();
-});
-
-// Debug middleware
-app.use((req, res, next) => {
-    console.log(`Request: ${req.method} ${req.url}`);
-    console.log(`Looking for file: ${path.join(__dirname, '../public', req.url)}`);
-    next();
-});
-
 // Define important directory paths
+const PUBLIC_DIR = path.join(__dirname, '../public');
 const UPLOAD_FOLDER = path.join(__dirname, '../static/videos');
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const SAVED_SEARCHES_DIR = path.join(DATA_DIR, 'saved_searches');
 const PERMA_FILTER_FILE = path.join(DATA_DIR, 'perma_filter.json');
 
-// Create directories if they don't exist
-[UPLOAD_FOLDER, DATA_DIR, SAVED_SEARCHES_DIR].forEach(dir => {
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
+// Debug middleware
+app.use((req, res, next) => {
+    console.log(`Request: ${req.method} ${req.url}`);
+    console.log(`Looking for file: ${path.join(PUBLIC_DIR, req.url)}`);
+    console.log('Request headers:', req.headers);
+    next();
+});
+
+// Configure MIME types and static file serving
+app.use((req, res, next) => {
+    if (req.url.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    } else if (req.url.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css; charset=utf-8');
+    } else if (req.url.endsWith('.html')) {
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    }
+    // Add some debug logging
+    console.log(`Requesting: ${req.url}, Content-Type:`, res.getHeader('Content-Type'));
+    next();
+});
+
+// Serve static files with proper headers
+app.use(express.static(path.join(__dirname, '../public'), {
+    setHeaders: (res, path, stat) => {
+        if (path.endsWith('.js')) {
+            res.set('Content-Type', 'application/javascript; charset=utf-8');
+        } else if (path.endsWith('.css')) {
+            res.set('Content-Type', 'text/css; charset=utf-8');
+        }
+    }
+}));
+
+// Debug route to check file content
+app.get('/debug-file', (req, res) => {
+    const filePath = req.query.path;
+    const fullPath = path.join(__dirname, '../public', filePath);
+    
+    try {
+        if (fs.existsSync(fullPath)) {
+            const content = fs.readFileSync(fullPath, 'utf8');
+            res.json({
+                exists: true,
+                content: content,
+                path: fullPath
+            });
+        } else {
+            res.json({
+                exists: false,
+                path: fullPath
+            });
+        }
+    } catch (error) {
+        res.json({
+            error: error.message,
+            path: fullPath
+        });
     }
 });
 
-// Initialize perma_filter.json if it doesn't exist
-if (!fs.existsSync(PERMA_FILTER_FILE)) {
-    fs.writeFileSync(PERMA_FILTER_FILE, JSON.stringify({ pages: [] }));
-}
-
-// Add this near the top after imports
-let currentAccessToken = process.env.FB_ACCESS_TOKEN;
-
-// Add this right after to ensure the token is loaded
-console.log('Initial access token loaded:', currentAccessToken ? 'Yes' : 'No');
+// Root path handler
+app.get('/', (req, res) => {
+    res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
+});
 
 // Route to fetch ads from Facebook's Ad Library API
 app.post('/api/fetch-ads', async (req, res) => {
@@ -690,15 +723,46 @@ app.get('/proxy-download', async (req, res) => {
     }
 });
 
-// AFTER all API routes, add the static file middleware
-app.use(express.static(path.join(__dirname, '../public')));
-
-// Finally, add the catch-all route for the SPA
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
+// Add logging middleware for JavaScript files
+app.use((req, res, next) => {
+    if (req.url.endsWith('.js')) {
+        const filePath = path.join(__dirname, '../public', req.url);
+        console.log('Serving JS file:', req.url);
+        console.log('File exists:', fs.existsSync(filePath));
+        if (fs.existsSync(filePath)) {
+            console.log('File content preview:', fs.readFileSync(filePath, 'utf8').substring(0, 100));
+        }
+    }
+    next();
 });
 
-// Global error handler
+// Place this after all API routes
+app.get('*', (req, res, next) => {
+    // Check if it's an API request
+    if (req.path.startsWith('/api/')) {
+        return next();
+    }
+    
+    // Check if the requested file exists
+    const filePath = path.join(PUBLIC_DIR, req.path);
+    try {
+        if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+            return res.sendFile(filePath);
+        }
+    } catch (error) {
+        console.error('Error checking file:', error);
+    }
+    
+    // If not an API request and file doesn't exist, serve index.html
+    res.sendFile(path.join(PUBLIC_DIR, 'index.html'), (err) => {
+        if (err) {
+            console.error('Error sending index.html:', err);
+            res.status(500).send('Error loading page');
+        }
+    });
+});
+
+// Global error handler - keep at the very end
 app.use((err, req, res, next) => {
     console.error('Unhandled error:', err);
     res.status(500).json({ error: 'Internal server error' });
@@ -760,16 +824,43 @@ async function refreshLongLivedToken() {
 // Modify your server startup
 const startServer = async () => {
     try {
-        // Ensure currentAccessToken is set before refresh attempt
         currentAccessToken = process.env.FB_ACCESS_TOKEN;
         console.log('Starting server with token:', currentAccessToken ? 'Token present' : 'No token');
         
-        // Attempt to refresh token
         await refreshLongLivedToken();
         
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
             console.log('Current access token:', currentAccessToken ? 'Token present' : 'No token');
+            console.log(`Server is serving files from: ${PUBLIC_DIR}`);
+            
+            // Log directory structure
+            const indexPath = path.join(PUBLIC_DIR, 'index.html');
+            const appJsPath = path.join(PUBLIC_DIR, 'js/pages/ResultsPage/ResultsPage.js');
+            
+            console.log('Directory structure check:');
+            console.log(`- public directory exists: ${fs.existsSync(PUBLIC_DIR)}`);
+            console.log(`- index.html exists: ${fs.existsSync(indexPath)}`);
+            console.log(`- ResultsPage.js exists: ${fs.existsSync(appJsPath)}`);
+            
+            // List files in public directory
+            if (fs.existsSync(PUBLIC_DIR)) {
+                console.log('\nFiles in public directory:');
+                const listDir = (dir, prefix = '') => {
+                    const items = fs.readdirSync(dir);
+                    items.forEach(item => {
+                        const fullPath = path.join(dir, item);
+                        const stat = fs.statSync(fullPath);
+                        if (stat.isDirectory()) {
+                            console.log(`${prefix}📁 ${item}/`);
+                            listDir(fullPath, prefix + '  ');
+                        } else {
+                            console.log(`${prefix}📄 ${item}`);
+                        }
+                    });
+                };
+                listDir(PUBLIC_DIR);
+            }
         });
     } catch (error) {
         console.error('Server startup error:', error);
@@ -778,4 +869,3 @@ const startServer = async () => {
 
 // Call startServer instead of app.listen
 startServer();
-

@@ -1,5 +1,17 @@
-import { state } from '../app.js';
-import { escapeHtml, formatDate } from '../utils/helpers.js';
+import { state } from '../../../../app.js';
+
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function formatDate(dateString) {
+    return new Date(dateString).toLocaleDateString();
+}
 
 // Add this function at the top level of the file
 export function updateTableStats() {
@@ -22,7 +34,6 @@ export function updateTableStats() {
                 <span>Filtered Pages: ${filteredPagesCount}</span>
             `;
 
-            // Safely update stats elements if they exist
             const topStats = document.querySelector('.total-entries');
             const bottomStats = document.querySelector('.total-entries-bottom');
 
@@ -32,15 +43,13 @@ export function updateTableStats() {
         } catch (error) {
             console.error('Error updating table stats:', error);
         }
-    }, 100); // Increased timeout to ensure table is ready
+    }, 100);
 }
 
-// Filtering Functions
 export function filterAd(adId) {
     if (!state.filteredAds.has(adId)) {
         state.filteredAds.add(adId);
         
-        // Remove the row using DataTables API
         state.adsTable.rows((idx, data) => data.id === adId)
             .remove()
             .draw();
@@ -54,7 +63,6 @@ export function filterPage(pageName) {
     if (!state.filteredPages.has(pageName)) {
         state.filteredPages.add(pageName);
         
-        // Find and filter all ads from this page
         state.adsTable.rows((idx, data) => {
             if (data.page_name === pageName) {
                 state.filteredAds.add(data.id);
@@ -74,18 +82,9 @@ export function unfilterAd(adId) {
     if (state.filteredAds.has(adId)) {
         state.filteredAds.delete(adId);
         
-        // Check if this ad's page is filtered
         const adData = state.currentAdsData.find(ad => ad.id === adId);
         if (adData && !state.filteredPages.has(adData.page_name)) {
-            // Transform the data to match DataTables format
-            const transformedData = {
-                ad_creation_time: adData.ad_creation_time,
-                page_name: adData.page_name,
-                eu_total_reach: adData.eu_total_reach,
-                ad_snapshot_url: adData.ad_snapshot_url,
-                id: adData.id
-            };
-            
+            const transformedData = transformAdData(adData);
             state.adsTable.row.add(transformedData).draw();
         }
         
@@ -98,19 +97,10 @@ export function unfilterPage(pageName) {
     if (state.filteredPages.has(pageName)) {
         state.filteredPages.delete(pageName);
         
-        // Unfilter all ads from this page
         state.currentAdsData.forEach(ad => {
             if (ad.page_name === pageName && state.filteredAds.has(ad.id)) {
                 state.filteredAds.delete(ad.id);
-                // Transform the data to match DataTables format
-                const transformedData = {
-                    ad_creation_time: ad.ad_creation_time,
-                    page_name: ad.page_name,
-                    eu_total_reach: ad.eu_total_reach,
-                    ad_snapshot_url: ad.ad_snapshot_url,
-                    id: ad.id
-                };
-                
+                const transformedData = transformAdData(ad);
                 state.adsTable.row.add(transformedData);
             }
         });
@@ -132,7 +122,6 @@ export function updateFilteredView(showModal = false) {
     const filteredAdsDiv = document.getElementById('filteredAds');
     const searchInput = document.getElementById('pageSearch');
     
-    // Function to filter items based on search text
     const filterItems = (items, searchText) => {
         if (!searchText) return items;
         searchText = searchText.toLowerCase();
@@ -141,7 +130,6 @@ export function updateFilteredView(showModal = false) {
         );
     };
 
-    // Update filtered pages
     const updatePages = (searchText = '') => {
         const filteredPagesList = filterItems(Array.from(state.filteredPages), searchText);
         filteredPagesDiv.innerHTML = filteredPagesList.map(pageName => `
@@ -156,7 +144,6 @@ export function updateFilteredView(showModal = false) {
         `).join('');
     };
 
-    // Update filtered ads
     const updateAds = (searchText = '') => {
         const filteredAdsList = Array.from(state.filteredAds)
             .map(adId => state.currentAdsData.find(a => a.id === adId))
@@ -176,11 +163,9 @@ export function updateFilteredView(showModal = false) {
         `).join('');
     };
 
-    // Initial update
     updatePages();
     updateAds();
 
-    // Add search event listener
     if (!searchInput.hasEventListener) {
         searchInput.addEventListener('input', (e) => {
             const searchText = e.target.value;
@@ -199,27 +184,12 @@ export function closeFilteredView() {
     document.getElementById('filteredModal').style.display = 'none';
 }
 
-// Helper function to create table row from ad data
-function createTableRow(ad) {
-    return [
-        ad.ad_creation_time,
-        ad.page_name,
-        ad.eu_total_reach,
-        `<div class="video-container" id="video-${ad.id}">
-            <button class="action-btn video-btn" onclick="loadVideo('${ad.ad_snapshot_url}', this)" data-url="${ad.ad_snapshot_url}">
-                <i class="fas fa-play"></i> Load Video
-            </button>
-        </div>`,
-        `<div class="table-actions">
-            <a href="${ad.ad_snapshot_url}" target="_blank" class="action-btn view-btn">
-                <i class="fas fa-external-link-alt"></i> View
-            </a>
-            <button onclick="filterAd('${ad.id}')" class="action-btn filter-btn">
-                <i class="fas fa-filter"></i> Filter
-            </button>
-            <button onclick="filterPage('${ad.page_name}')" class="action-btn filter-page-btn">
-                <i class="fas fa-filter"></i> Filter Page
-            </button>
-        </div>`
-    ];
+function transformAdData(ad) {
+    return {
+        ad_creation_time: ad.ad_creation_time,
+        page_name: ad.page_name,
+        eu_total_reach: ad.eu_total_reach,
+        ad_snapshot_url: ad.ad_snapshot_url,
+        id: ad.id
+    };
 }

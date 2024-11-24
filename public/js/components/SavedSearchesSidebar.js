@@ -1,8 +1,8 @@
 import { state } from '../app.js';
 import { showSuccessToast, showErrorToast } from './Toast.js';
-import { updateResults } from '../pages/ResultsPage.js';
+import { updateResults } from '../pages/ResultsPage/ResultsPage.js';
 import { updateAccessTokens } from './FormHandler.js';
-import { updateFilteredView } from './FilteredModal.js';
+import { updateFilteredView } from '../pages/ResultsPage/components/filter/FilteredModal.js';
 
 async function saveCurrentSearch() {
     // First check if we have current data to save

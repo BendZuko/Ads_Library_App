@@ -1,6 +1,6 @@
-import { state } from '../app.js';
-import { showToast } from './Toast.js';
-import { updateResults } from '../pages/ResultsPage.js';
+import { state } from '../../../../app.js';
+import { showToast } from '../../../../components/Toast.js';
+import { updateResults } from '../../ResultsPage.js';
 
 export function updatePermFilteredView(showModal = false) {
     const permFilteredPagesDiv = document.getElementById('permFilteredPages');

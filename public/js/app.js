@@ -8,38 +8,44 @@ export const state = {
     isLoadingVideos: false
 };
 
-// Import modular components
+// Import modular components with correct paths
 import { initializeForm, handleFormSubmit } from './components/FormHandler.js';
 import { 
     initializeDataTable, 
     updateResults, 
-    loadAllVideos, 
-    downloadCSV, 
-    loadVideo,
-    addToPermaFilter
-} from './pages/ResultsPage.js';
+    clearCurrentSearchName,
+    clearSavedSearchesCache,
+    fetchSavedSearches
+} from './pages/ResultsPage/ResultsPage.js';
+import { VideoHandler } from './pages/ResultsPage/components/video/VideoHandler.js';
+import { FilterHandler } from './pages/ResultsPage/components/filter/FilterHandler.js';
+import { StatsModal } from './pages/ResultsPage/components/stats/StatsModal.js';
 import { showToast, showSuccessToast, showErrorToast } from './components/Toast.js';
 import { 
-    filterAd, 
-    filterPage, 
-    unfilterAd, 
-    unfilterPage,
     updateFilteredView,
     openFilteredView,
     closeFilteredView
-} from './components/FilteredModal.js';
+} from './pages/ResultsPage/components/filter/FilteredModal.js';
 import {
     toggleSavedSearches,
     loadSavedSearch,
     saveCurrentSearch,
-    deleteSavedSearch,
-    clearCurrentSearchName
+    deleteSavedSearch
 } from './components/SavedSearchesSidebar.js';
 import {
     openPermFilteredView,
     closePermFilteredView,
     unPermFilterPage
-} from './components/PermFilteredModal.js';
+} from './pages/ResultsPage/components/filter/PermFilteredModal.js';
+
+// Initialize StatsModal
+const statsModal = new StatsModal();
+
+// Extract methods from VideoHandler
+const { loadVideo, loadAllVideos, downloadCSV } = VideoHandler;
+
+// Extract methods from FilterHandler
+const { filterAd, filterPage, unfilterAd, unfilterPage, addToPermaFilter } = FilterHandler;
 
 // Application Initialization
 document.addEventListener('DOMContentLoaded', () => {
@@ -52,6 +58,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.filtered-view-btn')?.addEventListener('click', openFilteredView);
     document.querySelector('.view-saved-btn')?.addEventListener('click', toggleSavedSearches);
 
+    // Stats cell click handler
+    $('#resultsTable').on('click', '.stats-cell', function() {
+        const rowData = state.adsTable.row($(this).closest('tr')).data();
+        statsModal.showStats(rowData.id);
+    });
+
     // Hide sidebar on initial load
     const sidebar = document.querySelector('.saved-searches-sidebar');
     if (sidebar) {
@@ -59,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Export necessary functions for global usage
+// Export all necessary functions and objects
 export {
     handleFormSubmit,
     updateResults,
@@ -70,18 +82,21 @@ export {
     filterPage,
     unfilterAd,
     unfilterPage,
+    addToPermaFilter,
     toggleSavedSearches,
     loadSavedSearch,
     saveCurrentSearch,
     deleteSavedSearch,
-    loadAllVideos,
     loadVideo,
+    loadAllVideos,
     downloadCSV,
     openFilteredView,
     closeFilteredView,
-    addToPermaFilter,
     openPermFilteredView,
     closePermFilteredView,
     unPermFilterPage,
-    clearCurrentSearchName
+    clearCurrentSearchName,
+    statsModal,
+    fetchSavedSearches,
+    FilterHandler
 };
